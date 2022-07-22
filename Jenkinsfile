@@ -52,7 +52,7 @@ pipeline {
                         env.BUILD_PROPERTIES += """
                             -Dsonar.pullrequest.key=${env.CHANGE_ID}
                             -Dsonar.pullrequest.branch=${SCM_BRANCH}
-                            -Dsonar.pullrequest.base=develop
+                            -Dsonar.pullrequest.base=main
                         """
                     } else {
                         env.BUILD_PROPERTIES += """
