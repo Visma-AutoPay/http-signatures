@@ -137,6 +137,12 @@ final class SignatureSigner {
         }
     }
 
+    private void forever() {
+        while (true) {
+            System.out.println("Loop...");
+        }
+    }
+
     private SignatureSigner() {
         throw new UnsupportedOperationException();
     }
