@@ -6,9 +6,39 @@
 
     <groupId>com.visma.autopay</groupId>
     <artifactId>http-signatures</artifactId>
-    <name>AutoPay HTTP Signatures</name>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>Java implementation of IETF HTTP Message Signatures</description>
+    <url>https://github.com/Visma-AutoPay/http-signatures</url>
+
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Robert Borys</name>
+            <email>robert.borys@visma.com</email>
+            <organization>Visma Autopay AS</organization>
+            <organizationUrl>https://www.visma.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Jan Ståle Berg</name>
+            <email>jan.stale.berg@visma.com</email>
+            <organization>Visma Autopay AS</organization>
+            <organizationUrl>https://www.visma.com/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/Visma-AutoPay/http-signatures.git</connection>
+        <developerConnection>scm:git:https://github.com/Visma-AutoPay/http-signatures.git</developerConnection>
+        <url>https://github.com/Visma-AutoPay/http-signatures</url>
+    </scm>
 
     <properties>
         <maven.min.version>3.8.1</maven.min.version>
@@ -71,6 +101,16 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.4.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>3.0.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.10.1</version>
                 </plugin>
@@ -129,24 +169,12 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
     <profiles>
         <profile>
-            <id>prod</id>
+            <id>jacoco</id>
             <build>
                 <plugins>
                     <plugin>
@@ -172,6 +200,51 @@
                                         <format>XML</format>
                                     </formats>
                                 </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
