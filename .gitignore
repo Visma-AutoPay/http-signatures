@@ -1,7 +1,36 @@
 # IntelliJ IDEA
 .idea
 *.iml
+*.ipr
+*.iws
+out/
 
-# Binaries
+# Visual Studio Code
+.vscode
+.history
+*.vsix
+
+# Eclipse
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+.externalToolBuilders/
+*.launch
+.factorypath
+
+# NetBeans
+nbproject/
+build/
+nbbuild/
+dist/
+nbdist/
+
+# Maven
 target
-build
