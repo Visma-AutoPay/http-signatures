@@ -208,7 +208,7 @@
         </profile>
 
         <profile>
-            <id>deploy</id>
+            <id>release</id>
             <build>
                 <plugins>
                     <plugin>
