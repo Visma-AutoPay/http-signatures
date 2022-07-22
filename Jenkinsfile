@@ -44,6 +44,7 @@ pipeline {
                     }
 
                     env.BUILD_PROPERTIES = """
+                        -Dsonar.scm.disabled=false
                         -Dsonar.projectKey=AutoPay.Signatures
                     """
 
