@@ -3,8 +3,8 @@
 HTTP Message Signatures provide a mechanism for end-to-end integrity and
 authenticity for components of an HTTP message.
 
-This library provides high-level Java interface for creating and verifying
-signatures as defined in
+This library provides a high-level Java interface for creating and verifying
+signatures as defined in the
 [HTTP Message Signatures specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html)
 (draft 10). As by-products, it implements
 [Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html)
@@ -31,14 +31,14 @@ Signature: my-signature=:6R8T8jBjqZfYtshgTaYVahGmXIRmr9C3zaLIEYLLtQKrMiR/W4LCYqH
 This library allows to compute and verify `Content-Digest`, `Signature-Input`
 and `Signature` headers.
 
-- `Content-Digest` - A digest (hash value) of request body, defined by
+- `Content-Digest` - A digest (hash value) of the request body, defined by
 [Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html)
 - `Signature-Input` - Defines the signature: which parts of the request are 
 included, what key is used
 - `Signature` - Concatenated request parts defined in the input are signed by
 using the referenced key. Both Signature-Input and Signature are defined by
 [HTTP Message Signatures](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html).
-- Syntax - Those headers are formatted by using syntax of
+- Syntax - Those headers are formatted by using the syntax of
 [Structured Field Values for HTTP](https://www.rfc-editor.org/rfc/rfc8941)
 
 
@@ -73,7 +73,8 @@ var signatureParameters = SignatureParameters.builder()
         .build();
 ```
 
-After that, the actual values from signed request or response should be provided
+After that, the actual values from the signed request or response should be
+provided
 ```java
 var requestContext = SignatureContext.builder()
         .method("POST")
@@ -108,8 +109,8 @@ try {
 
 Similar steps are needed when verifying a signature.
 
-First, you can define required components and parameters. It's an optional step,
-needed only if some of them are actually required.
+First, you can define the required components and parameters. It's an optional
+step, needed only if some of them are actually required.
 
 ```java
 var requiredComponents = SignatureComponents.builder()
@@ -131,7 +132,7 @@ var signatureContext = SignatureContext.builder()
         .build();
 ```
 
-You need a method which for given key ID returns corresponding public key
+You need a method that for a given key ID returns the corresponding public key
 ```java
 private PublicKeyInfo getPublicKey(String keyId) {
     PublicKey publicKey = publicKeyRepository.getPublicKey(keyId);
@@ -172,11 +173,11 @@ try {
 For details, see [SignatureComponents.Builder](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/SignatureComponents.Builder.html)
 ```java
 var signatureComponents = SignatureComponents.builder()
-        // Components derived from request
+        // Components derived from the request
         .method().path().authority().query().queryParam("id")
-        // Components derived from response
+        // Components derived from the response
         .status()
-        // When signing response, components from related request can be added
+        // When signing a response, components from related request can be added
         .relatedRequestMethod().relatedRequestPath()
 
         // Header names can be provided one-by-one
@@ -220,9 +221,9 @@ var signatureParameters = SignatureParameters.builder()
         // or use provided one
         .nonce(UUID.randomUUID().toString())
 
-        // Use given algorithm when signing
+        // Use the given algorithm when signing
         .algorithm(SignatureAlgorithm.ED_25519)
-        // Use it and expose in alg parameter
+        // Use it and expose it in the `alg` parameter
         .visibleAlgorithm(SignatureAlgorithm.ED_25519)
 
         // Key ID
@@ -291,9 +292,9 @@ try {
 
 ##### Signature components
 
-Required components can be defined. Such components must be present in verified
-signature, e.g. a header must be included in the `Signature-Input` and it's
-value must be present in the context.
+Required components can be defined. Such components must be present in the
+verified signature, e.g. a header must be included in the `Signature-Input` and
+its value must be present in the context.
 ```java
 var requiredComponents = SignatureComponents.builder()
         // See Signature components above
@@ -309,17 +310,18 @@ var requiredIfPresentComponents = SignatureComponents.builder()
         .build();
 ```
 
-Apart from those defined above, verified signature can contain any components.
+Apart from those defined above, the verified signature can contain any
+components.
 
 ##### Signature parameters
 
-Required parameters must be present in verified signature.
+Required parameters must be present in the verified signature.
 For full list, see [SignatureParameterType](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/SignatureParameterType.html)
 ```java
 var requiredParameters = List.of(SignatureParameterType.KEY_ID, SignatureParameterType.CREATED, SignatureParameterType.NONCE);
 ```
 
-Forbidden parameters must not be present in verified signature
+Forbidden parameters must not be present the in verified signature
 ```java
 var forbiddenParameters = List.of(SignatureParameterType.ALGORITHM);
 ```
@@ -366,9 +368,9 @@ var verificationSpec = VerificationSpec.builder()
         // Same goes for forbidden parameters
         .forbiddenParameters(SignatureParameterType.ALGORITHM)
         
-        // Maximum age of verified signature in seconds. Age is computed basing
-        // on `created`'s value. Signature is rejected if older than given age,
-        // regardless of its `expiration` set in the parameters.
+        // Maximum age of verified signature in seconds. Age is computed based
+        // on `created`'s value. A signature is rejected if older than the given
+        // age, regardless of its `expiration` set in the parameters.
         .maximumAge(30)
         
         // Maximum clock "skew" for `created` parameter. It's for detecting
@@ -397,18 +399,19 @@ try {
 
 ### Security providers
 
-Default security providers are used for all operations: signing, verifying,
-parsing keys provided as PKCS#8 / X.509. If you don't add any third party
+Default security providers are used for all operations: signing, verifying and
+parsing keys provided as PKCS#8 / X.509. If you don't add any third-party
 provider then "Sun" providers will be used, like `SunRsaSign` for RSA,
-`SunEC` for elliptic curves , `SunJCE` for HMAC.
+`SunEC` for elliptic curves and `SunJCE` for HMAC.
 
-To use a specific third party provider, add it as the first one.
+To use a specific third-party provider, add it as the first one.
 ```java
 Security.insertProviderAt(new BouncyCastleProvider(), 1);
 ```
 
-Support for Edwards-Curve signatures (`SignatureAlgorithm.ED_25519`) was added
-to JRE in Java 15. For older JREs a third party provider must be used.
+Support for Edwards-Curve signatures (`SignatureAlgorithm.ED_25519`, `Ed25519`)
+was added to JRE in Java 15. For older JREs, a third-party provider must be
+used.
 
 As [ECDSA signatures require IEEE P1363 format (raw)](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-ecdsa-using-curve-p-256-dss),
 algorithm `SHA256withECDSAinP1363Format` is used rather than `SHA256withECDSA`.
@@ -578,8 +581,8 @@ httpHeaders.put("Content-Type", contentType.serialize());
 
 ### Parsing
 
-Each item class has a static `parse()` method which parses given string to item
-class.
+Each item class has a static `parse()` method which parses the given string to
+an item class.
 ```java
 StructuredInteger.parse("45");
 StructuredToken.parse("text/plan;charset=utf-8");
@@ -587,7 +590,7 @@ StructuredList.parse("21, ?1, ok");
 StructuredDictionary.parse("key=value;param=ok, key2=value2");
 ```
 
-If the type is not known beforehand then more generic method can be used.
+If the type is not known beforehand then a more generic method can be used.
 ```java
 // can return Structured Integer, Decimal, Bytes, String or Token 
 StructuredItem item = StructuredItem.parse(header);
