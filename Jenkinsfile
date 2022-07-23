@@ -66,7 +66,7 @@ pipeline {
 
                     env.BUILD_PROPERTIES = """
                         -Dsonar.scm.disabled=false
-                        -Dsonar.projectKey=AutoPay.Signatures
+                        -Dsonar.projectKey=AutoPay.HttpSignatures
                     """
 
                     if (env.CHANGE_ID) {
