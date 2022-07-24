@@ -47,7 +47,7 @@ final class SignatureSigner {
      *         logging or debugging
      * @throws SignatureException Problems with signature calculation, e.g. missing or malformatted values in Signature Context, problems with the private key.
      *                            For detailed reason call {@link SignatureException#getErrorCode()}.
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-creating-a-signature">Creating a Signature</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-creating-a-signature">Creating a Signature</a>
      */
     static SignatureResult sign(SignatureSpec signatureSpec) throws SignatureException {
         var components = extractUsedComponents(signatureSpec);
@@ -70,7 +70,7 @@ final class SignatureSigner {
      * @param signatureInput   Value of <em>Signature-Input</em> header provided as Structured Inner List
      * @return Signature base to be used for signature creation or verification
      * @throws SignatureException In case of problems with extracting values from the Signature Context, e.g. missing or malformatted HTTP header
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#create-sig-input">Creating the Signature Base</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#create-sig-input">Creating the Signature Base</a>
      */
     static String getSignatureBase(List<Component> components, SignatureContext signatureContext, StructuredInnerList signatureInput)
             throws SignatureException {

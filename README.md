@@ -5,8 +5,8 @@ authenticity for components of an HTTP message.
 
 This library provides a high-level Java interface for creating and verifying
 signatures as defined in the
-[HTTP Message Signatures specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html)
-(draft 10). As by-products, it implements
+[HTTP Message Signatures specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html)
+(draft 11). As by-products, it implements
 [Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html)
 (draft 10) and
 [Structured Field Values for HTTP](https://www.rfc-editor.org/rfc/rfc8941).
@@ -37,7 +37,7 @@ and `Signature` headers.
 included, what key is used
 - `Signature` - Concatenated request parts defined in the input are signed by
 using the referenced key. Both Signature-Input and Signature are defined by
-[HTTP Message Signatures](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html).
+[HTTP Message Signatures](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html).
 - Syntax - Those headers are formatted by using the syntax of
 [Structured Field Values for HTTP](https://www.rfc-editor.org/rfc/rfc8941)
 
@@ -413,7 +413,7 @@ Support for Edwards-Curve signatures (`SignatureAlgorithm.ED_25519`, `Ed25519`)
 was added to JRE in Java 15. For older JREs, a third-party provider must be
 used.
 
-As [ECDSA signatures require IEEE P1363 format (raw)](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-ecdsa-using-curve-p-256-dss),
+As [ECDSA signatures require IEEE P1363 format (raw)](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-ecdsa-using-curve-p-256-dss),
 algorithm `SHA256withECDSAinP1363Format` is used rather than `SHA256withECDSA`.
 If your provider uses a different name, like Bouncy Castle's
 `SHA256withPLAIN-ECDSA`, then a delegate must be implemented.

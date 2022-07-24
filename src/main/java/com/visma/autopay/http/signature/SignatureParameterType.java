@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 /**
  * Defines types of Signature Parameters
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-signature-parameters">Signature Parameters</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-signature-parameters">Signature Parameters</a>
  */
 public enum SignatureParameterType {
     /**
