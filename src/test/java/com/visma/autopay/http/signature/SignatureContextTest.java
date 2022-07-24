@@ -37,13 +37,13 @@ class SignatureContextTest {
         // setup
         var headers = Map.of(
                 "header-1", List.of("one", "two"),
-                "header-2", Arrays.asList(null, "", "xx", "yy")
+                "header-2", Arrays.asList("", "xx", "yy")
         );
 
         // execute
         var signatureContext = SignatureContext.builder().headers(headers).build();
 
         // verify
-        assertThat(signatureContext.getHeaders()).containsOnly(entry("header-1", "one, two"), entry("header-2", "xx, yy"));
+        assertThat(signatureContext.getHeaders()).containsOnly(entry("header-1", List.of("one", "two")), entry("header-2", List.of("", "xx", "yy")));
     }
 }

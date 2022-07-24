@@ -64,6 +64,14 @@ abstract class Component {
      */
     protected static final String QUERY_PARAM_NAME_PARAM = "name";
 
+    /**
+     * Structures Parameter key for Binary-wrapped Fields
+     *
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-binary-wrapped-http-fields">
+     *      Binary-wrapped HTTP Fields</a>
+     */
+    protected static final String BINARY_WRAPPED_PARAM = "bs";
+
     private final StructuredString name;
 
     /**

@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import java.security.Security;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import static com.visma.autopay.http.signature.ObjectMother.getSignatureSpecBuilder;
 import static com.visma.autopay.http.signature.ObjectMother.getVerificationSpecBuilder;
@@ -491,6 +492,61 @@ class SignatureBaseSpecificationTest {
                         .build())
                 .requiredComponents(requiredComponents)
                 .requiredIfPresentComponents(usedIfPresentComponents)
+                .build();
+
+        // execute
+        var result = signatureSpec.sign();
+
+        // verify signature
+        assertThat(result.getSignatureBase()).isEqualTo(expectedSignatureBase);
+        assertThat(result.getSignatureInput()).isEqualTo(expectedSignatureInput);
+        assertThat(result.getSignature()).isEqualTo(expectedSignature);
+
+        // signature verification
+        assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
+    }
+
+    @Test
+    void binaryWrappedHeader() throws Exception {
+        // setup
+        var url = "https://example.com";
+        var relatedRequestContext = SignatureContext.builder()
+                .header("Request-Header", "first")
+                .header("Request-Header", "")
+                .header("Request-Header", "last")
+                .build();
+        var signatureSpec = getSignatureSpecBuilder()
+                .components(SignatureComponents.builder()
+                        .binaryWrappedHeader("Example-Header")
+                        .binaryWrappedHeader("Example-Header-2")
+                        .relatedRequestBinaryWrappedHeader("Request-Header")
+                        .build())
+                .parameters(SignatureParameters.builder().algorithm(SignatureAlgorithm.ED_25519).build())
+                .context(SignatureContext.builder()
+                        .targetUri(url)
+                        .header("Example-Header", "value, with, lots")
+                        .header("Example-Header", "of, commas")
+                        .header("Example-Header-2", "value, with, lots, of, commas")
+                        .relatedRequest(relatedRequestContext)
+                        .build())
+                .build();
+
+        var expectedSignatureBase = "\"example-header\";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:\n" +
+                "\"example-header-2\";bs: :dmFsdWUsIHdpdGgsIGxvdHMsIG9mLCBjb21tYXM=:\n" +
+                "\"request-header\";req;bs: :Zmlyc3Q=:, ::, :bGFzdA==:\n" +
+                "\"@signature-params\": (\"example-header\";bs \"example-header-2\";bs \"request-header\";req;bs)";
+        var expectedSignatureInput = "test=(\"example-header\";bs \"example-header-2\";bs \"request-header\";req;bs)";
+        var expectedSignature = "test=:0xPltZydMtTl/8EyZCH0CAeRE7q/OZRjnZ4NY/VjmpmlP77zPIHXtmGVwJv89w5EXNquHXpg28mnR17wAtbWDw==:";
+
+        var verificationSpec = getVerificationSpecBuilder()
+                .context(SignatureContext.builder()
+                        .header(SignatureHeaders.SIGNATURE_INPUT, expectedSignatureInput)
+                        .header(SignatureHeaders.SIGNATURE, expectedSignature)
+                        .headers(Map.of("Example-Header", List.of("value, with, lots", "of, commas")))
+                        .header("Example-Header-2", "value, with, lots, of, commas")
+                        .targetUri(url)
+                        .relatedRequest(relatedRequestContext)
+                        .build())
                 .build();
 
         // execute

@@ -125,7 +125,7 @@ public class SignatureComponents {
          * @see HeaderComponent
          */
         public Builder relatedRequestHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, true));
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, true, false));
             return this;
         }
 
@@ -139,7 +139,7 @@ public class SignatureComponents {
          * @see HeaderComponent
          */
         public Builder canonicalizedHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, false));
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, false, false));
             return this;
         }
 
@@ -155,7 +155,7 @@ public class SignatureComponents {
          * @see HeaderComponent
          */
         public Builder relatedRequestCanonicalizedHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, true));
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, true, false));
             return this;
         }
 
@@ -170,7 +170,7 @@ public class SignatureComponents {
          * @see HeaderComponent
          */
         public Builder dictionaryMember(String headerName, String dictionaryKey) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, false));
+            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, false, false));
             return this;
         }
 
@@ -187,7 +187,35 @@ public class SignatureComponents {
          * @see HeaderComponent
          */
         public Builder relatedRequestDictionaryMember(String headerName, String dictionaryKey) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, true));
+            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, true, false));
+            return this;
+        }
+
+        /**
+         * Adds a single Binary-wrapped HTTP Field component
+         *
+         * @param headerName Header name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-binary-wrapped-http-fields">
+         *      Binary-wrapped HTTP Fields</a>
+         */
+        public Builder binaryWrappedHeader(String headerName) {
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, false, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Binary-wrapped HTTP Field component for Related request
+         *
+         * @param headerName Header name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-binary-wrapped-http-fields">
+         *      Binary-wrapped HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-request-response-signature-">
+         *      Request-Response Signature Binding</a>
+         */
+        public Builder relatedRequestBinaryWrappedHeader(String headerName) {
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, true, true));
             return this;
         }
 
