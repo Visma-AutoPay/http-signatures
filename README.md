@@ -192,6 +192,8 @@ var signatureComponents = SignatureComponents.builder()
         .canonicalizedHeader("My-Structured-Header")
         // Individual items of structured dictionary
         .dictionaryMember("My-Dictionary", "key-1")
+        // Multi-value header wrapped as structured byte sequences
+        .binaryWrappedHeader("Set-Cookie")
 
         // Single headers from related request, when signing response
         .relatedRequestHeader("Content-Type")
