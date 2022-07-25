@@ -64,10 +64,11 @@ pipeline {
                         env.BUILD_GOAL = env.BRANCH_BUILD_GOAL
                     }
 
-                    env.BUILD_PROPERTIES = """
+                    env.BUILD_PROPERTIES = '''
                         -Dsonar.scm.disabled=false
                         -Dsonar.projectKey=AutoPay.HttpSignatures
-                    """
+                        "-Dsonar.projectName=AutoPay HTTP Signatures"
+                    '''
 
                     if (env.CHANGE_ID) {
                         env.BUILD_PROPERTIES += """
@@ -80,6 +81,8 @@ pipeline {
                             -Dsonar.branch.name=${SCM_BRANCH}
                         """
                     }
+
+                    env.BUILD_PROPERTIES = env.BUILD_PROPERTIES.replaceAll("[\\n\t ]+", " ");
                 }
 
                 sh 'printenv | sort'
@@ -90,7 +93,7 @@ pipeline {
             steps {
                 echo 'Build...'
                 withSonarQubeEnv('Sonar Enterprise') {
-                    sh 'mvn clean ${BUILD_GOAL} -ntp -Pjacoco ${BUILD_PROPERTIES}'
+                    sh "mvn clean ${BUILD_GOAL} -ntp -Pjacoco ${BUILD_PROPERTIES}"
                 }
             }
         }
