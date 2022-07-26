@@ -25,8 +25,8 @@ pipeline {
     }
 
     environment {
-        MAIN_BUILD_GOAL = 'package'
-        BRANCH_BUILD_GOAL = 'package sonar:sonar'
+        MAIN_BUILD_GOAL = 'verify'
+        BRANCH_BUILD_GOAL = 'verify sonar:sonar'
     }
 
     tools {

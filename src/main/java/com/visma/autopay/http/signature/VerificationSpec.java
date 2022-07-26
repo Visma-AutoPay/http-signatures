@@ -76,7 +76,7 @@ public class VerificationSpec {
      *
      * @throws SignatureException Incorrect signature or problems with verification, e.g. missing or malformatted values in Signature Context, problems with the
      *                            public key. For detailed reason call {@link SignatureException#getErrorCode()}.
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-verifying-a-signature">Verifying a Signature</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-verifying-a-signature">Verifying a Signature</a>
      */
     public void verify() throws SignatureException {
         SignatureVerifier.verify(this);

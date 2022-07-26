@@ -30,13 +30,13 @@ import java.util.Objects;
  * <p>
  * Backed by {@link StructuredString}. Contains component definition - value should be provided in {@link SignatureContext}
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-http-message-components">HTTP Message Components</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-http-message-components">HTTP Message Components</a>
  */
 abstract class Component {
     /**
      * Structured Parameter key for Structured Dictionary members
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-dictionary-structured-field">
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-dictionary-structured-field">
      *      Dictionary Structured Field Members</a>
      */
     protected static final String DICTIONARY_KEY_PARAM = "key";
@@ -44,7 +44,7 @@ abstract class Component {
     /**
      * Structured Parameter key for Canonicalized fields
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-canonicalized-structured-ht">
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-canonicalized-structured-ht">
      *      Canonicalized Structured HTTP Fields</a>
      */
     protected static final String CANONICALIZED_FIELD_PARAM = "sf";
@@ -52,7 +52,7 @@ abstract class Component {
     /**
      * Structured Parameter key for components from Related Request
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-request-response-signature-">
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-request-response-signature-">
      *      Request-Response Signature Binding</a>
      */
     protected static final String RELATED_REQUEST_PARAM = "req";
@@ -60,9 +60,17 @@ abstract class Component {
     /**
      * Structured Parameter key for Query Param name
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-query-parameters">Query Parameters</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-query-parameters">Query Parameters</a>
      */
     protected static final String QUERY_PARAM_NAME_PARAM = "name";
+
+    /**
+     * Structures Parameter key for Binary-wrapped Fields
+     *
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-binary-wrapped-http-fields">
+     *      Binary-wrapped HTTP Fields</a>
+     */
+    protected static final String BINARY_WRAPPED_PARAM = "bs";
 
     private final StructuredString name;
 

@@ -22,13 +22,18 @@
 package com.visma.autopay.http.signature;
 
 import com.visma.autopay.http.signature.SignatureException.ErrorCode;
+import com.visma.autopay.http.structured.StructuredBytes;
 import com.visma.autopay.http.structured.StructuredDictionary;
 import com.visma.autopay.http.structured.StructuredException;
 import com.visma.autopay.http.structured.StructuredField;
+import com.visma.autopay.http.structured.StructuredItem;
 import com.visma.autopay.http.structured.StructuredString;
 
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Class representing HTTP Fields (Headers) Component
@@ -36,12 +41,13 @@ import java.util.Objects;
  * Both "plain" headers, canonicalized fields and dictionary field members are represented.
  * From both "this" and "related" request.
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-http-fields">HTTP Fields</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-http-fields">HTTP Fields</a>
  */
 final class HeaderComponent extends Component {
     private final String headerName;
     private final String dictionaryKey;
     private final boolean canonicalized;
+    private final boolean binaryWrapped;
 
     /**
      * Creates a Header Component of given header name
@@ -53,6 +59,7 @@ final class HeaderComponent extends Component {
         this.headerName = headerName;
         this.dictionaryKey = null;
         this.canonicalized = false;
+        this.binaryWrapped = false;
     }
 
     /**
@@ -62,12 +69,14 @@ final class HeaderComponent extends Component {
      * @param dictionaryKey      Dictionary key for Dictionary Structured Field Members
      * @param canonicalized      True for Canonicalized Structured HTTP Fields
      * @param fromRelatedRequest True if component is from related request
+     * @param binaryWrapped      True if header values need to be wrapped as binary structures
      */
-    HeaderComponent(String headerName, String dictionaryKey, boolean canonicalized, boolean fromRelatedRequest) {
-        super(getStructuredName(headerName, dictionaryKey, canonicalized, fromRelatedRequest));
+    HeaderComponent(String headerName, String dictionaryKey, boolean canonicalized, boolean fromRelatedRequest, boolean binaryWrapped) {
+        super(getStructuredName(headerName, dictionaryKey, canonicalized, fromRelatedRequest, binaryWrapped));
         this.headerName = headerName;
         this.dictionaryKey = dictionaryKey;
         this.canonicalized = canonicalized;
+        this.binaryWrapped = binaryWrapped;
 
         if (dictionaryKey != null && dictionaryKey.isEmpty()) {
             throw new IllegalArgumentException("Invalid dictionary key: " + dictionaryKey);
@@ -84,9 +93,11 @@ final class HeaderComponent extends Component {
         this.headerName = structuredHeader.stringValue();
         this.dictionaryKey = structuredHeader.stringParam(DICTIONARY_KEY_PARAM).orElse(null);
         this.canonicalized = structuredHeader.boolParam(CANONICALIZED_FIELD_PARAM).orElse(false);
+        this.binaryWrapped = structuredHeader.boolParam(BINARY_WRAPPED_PARAM).orElse(false);
     }
 
-    private static StructuredString getStructuredName(String headerName, String dictionaryKey, boolean canonicalized, boolean fromRelatedRequest) {
+    private static StructuredString getStructuredName(String headerName, String dictionaryKey, boolean canonicalized, boolean fromRelatedRequest,
+                                                      boolean binaryWrapped) {
         var params = new LinkedHashMap<String, Object>();
 
         if (fromRelatedRequest) {
@@ -101,24 +112,37 @@ final class HeaderComponent extends Component {
             params.put(DICTIONARY_KEY_PARAM, dictionaryKey);
         }
 
+        if (binaryWrapped) {
+            params.put(BINARY_WRAPPED_PARAM, true);
+        }
+
         return StructuredString.withParams(headerName, params);
     }
 
     @Override
     String computeValue(SignatureContext signatureContext) throws SignatureException {
-        var headerValue = signatureContext.getHeaders().get(headerName);
+        var headerValues = signatureContext.getHeaders().get(headerName);
+        String computedValue;
 
-        if (headerValue == null) {
+        if (headerValues == null) {
             throw new SignatureException(ErrorCode.MISSING_HEADER, "Header " + headerName + " is missing");
         }
 
-        if (dictionaryKey != null) {
-            return getDictionaryMember(headerValue);
-        } else if (canonicalized) {
-            return getCanonicalized(headerValue);
+        if (binaryWrapped) {
+            computedValue = getBinaryWrapped(headerValues);
         } else {
-            return headerValue;
+            var headerValue = getSingleValue(headerValues);
+
+            if (dictionaryKey != null) {
+                computedValue =  getDictionaryMember(headerValue);
+            } else if (canonicalized) {
+                computedValue =  getCanonicalized(headerValue);
+            } else {
+                computedValue =  headerValue;
+            }
         }
+
+        return computedValue;
     }
 
     @Override
@@ -131,12 +155,19 @@ final class HeaderComponent extends Component {
             return true;
         } else {
             try {
-                getDictionaryMember(headerValue);
+                getDictionaryMember(getSingleValue(headerValue));
                 return true;
             } catch (SignatureException e) {
                 return e.getErrorCode() != ErrorCode.MISSING_DICTIONARY_KEY;
             }
         }
+    }
+
+    private String getBinaryWrapped(List<String> headerValues) {
+        return headerValues.stream()
+                .map(value -> StructuredBytes.of(value.getBytes(StandardCharsets.UTF_8)))
+                .map(StructuredItem::serialize)
+                .collect(Collectors.joining(", "));
     }
 
     private String getCanonicalized(String headerValue) throws SignatureException {
@@ -163,6 +194,20 @@ final class HeaderComponent extends Component {
         } else {
             throw new SignatureException(ErrorCode.MISSING_DICTIONARY_KEY, "Key " + dictionaryKey + " is missing in header " + headerName);
         }
+    }
+
+    private String getSingleValue(List<String> headerValues) {
+        String headerValue;
+
+        if (headerValues.size() == 1) {
+            headerValue = headerValues.get(0);
+        } else {
+            headerValue = headerValues.stream()
+                    .filter(value -> !value.isEmpty())
+                    .collect(Collectors.joining(", "));
+        }
+
+        return headerValue;
     }
 
     @Override

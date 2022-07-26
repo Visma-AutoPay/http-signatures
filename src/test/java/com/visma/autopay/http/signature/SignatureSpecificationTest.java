@@ -145,6 +145,7 @@ class SignatureSpecificationTest {
         var signatureComponents = SignatureComponents.builder()
                 .authority()
                 .header("Content-Digest")
+                .queryParam("Pet")
                 .build();
         var signatureSpec = SignatureSpec.builder()
                 .signatureLabel(signatureLabel)
@@ -157,7 +158,7 @@ class SignatureSpecificationTest {
                 .algorithm(algorithm)
                 .publicKey(ObjectMother.getRsaPssPublicKey())
                 .build();
-        var expectedSignatureInput = "sig-b22=(\"@authority\" \"content-digest\");created=1618884473;keyid=\"test-key-rsa-pss\"";
+        var expectedSignatureInput = "sig-b22=(\"@authority\" \"content-digest\" \"@query-param\";name=\"Pet\");created=1618884473;keyid=\"test-key-rsa-pss\"";
 
         // execute
         var signatureResult = signatureSpec.sign();
@@ -170,11 +171,12 @@ class SignatureSpecificationTest {
         verificationSpec.verify();
 
         // verify example signature
-        var validSignature = "sig-b22=:Fee1uy9YGZq5UUwwYU6vz4dZNvfw3GYrFl1L6YlVIyUMuWswWDNSvql4dVtS" +
-                "eidYjYZUm7SBCENIb5KYy2ByoC3bI+7gydd2i4OAT5lyDtmeapnAa8uP/b9xUpg+VSPElbBs6JWBIQsd+n" +
-                "MdHDe+ls/IwVMwXktC37SqsnbNyhNp6kcvcWpevjzFcD2VqdZleUz4jN7P+W5A3wHiMGfIjIWn36KXNB+R" +
-                "KyrlGnIS8yaBBrom5rcZWLrLbtg6VlrH1+/07RV+kgTh/l10h8qgpl9zQHu7mWbDKTq0tJ8K4ywcPoC4s2" +
-                "I4rU88jzDKDGdTTQFZoTVZxZmuTM1FvHfzIw==:";
+        var validSignature = "sig-b22=:W2kxR52X0tXN9u7yjyPeWa0T3D0SVG8KkPo+lOWyb2TGdLz"
+                + "ixWjUlbehjnNhzA+wFWnE6+hdKH8KR6Z9FvsxCc+44XrqxzT7Vcsror5SjMyfx6Nq"
+                + "tELklj1u2L4JovANI80BSoVobSoc+v9NRVWJZU7WAVow8H2CucCcv2cy1tKFCTMyc"
+                + "m9LQrIz63Tg5tcGWj64b12nmwj9TwwkCygfz0MTyIytjYLVzKw7mXpL4jGFZ5lsw2"
+                + "VT2eB3qpF2d/Psy0p1heKhrkz9uvKeCoj+P5QjLMS4eirHDqpKqe9YmCaMsJAUYSU"
+                + "M86qC8qO6vMQhTMegTkEe25DquVcTiOAEAw==:";
         verificationSpec = getVerificationSpec(signatureLabel, keyId, publicKeyInfo, expectedSignatureInput, validSignature);
         verificationSpec.verify();
     }

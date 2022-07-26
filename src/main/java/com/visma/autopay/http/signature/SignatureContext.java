@@ -22,7 +22,9 @@
 package com.visma.autopay.http.signature;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -39,10 +41,10 @@ public class SignatureContext {
     private final Integer status;
     private final String method;
     private final URI targetUri;
-    private final Map<String, String> headers;
+    private final Map<String, List<String>> headers;
     private final SignatureContext relatedRequestContext;
 
-    private SignatureContext(Integer status, String method, URI targetUri, Map<String, String> headers, SignatureContext relatedRequestContext) {
+    private SignatureContext(Integer status, String method, URI targetUri, Map<String, List<String>> headers, SignatureContext relatedRequestContext) {
         this.status = status;
         this.method = method;
         this.targetUri = targetUri;
@@ -82,7 +84,7 @@ public class SignatureContext {
      *
      * @return Map of http headers
      */
-    Map<String, String> getHeaders() {
+    Map<String, List<String>> getHeaders() {
         return headers;
     }
 
@@ -90,7 +92,7 @@ public class SignatureContext {
      * Returns Signature Context for Related Request
      *
      * @return SignatureContext of Related Request
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-request-response-signature-">
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-request-response-signature-">
      *      Request-Response Signature Binding</a>
      */
     SignatureContext getRelatedRequestContext() {
@@ -113,7 +115,7 @@ public class SignatureContext {
         private Integer status;
         private String method;
         private URI targetUri;
-        private final Map<String, String> headers;
+        private final Map<String, List<String>> headers;
         private SignatureContext relatedRequestContext;
 
         private Builder() {
@@ -176,22 +178,23 @@ public class SignatureContext {
          * @param headerName  HTTP header (field) name
          * @param headerValue Header value
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-http-fields">HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-http-fields">HTTP Fields</a>
          */
         public Builder header(String headerName, Object headerValue) {
             headerName = headerName.toLowerCase();
             var sanitizedValue = sanitizeHeaderValue(headerValue);
+            var existingValue = headers.get(headerName);
 
-            if (headers.containsKey(headerName)) {
-                var existingValue = headers.get(headerName);
-
-                if (existingValue == null || existingValue.isEmpty()) {
-                    headers.put(headerName, sanitizedValue);
-                } else if (sanitizedValue != null && !sanitizedValue.isEmpty()) {
-                    headers.put(headerName, existingValue + ", " + sanitizedValue);
+            if (existingValue != null) {
+                // Optimization, together with List.of() below. In most cases, we'll have single-element lists.
+                if (existingValue.size() == 1) {
+                    existingValue = new ArrayList<>(existingValue);
+                    headers.put(headerName, existingValue);
                 }
+
+                existingValue.add(sanitizedValue);
             } else {
-                headers.put(headerName, sanitizedValue);
+                headers.put(headerName, List.of(sanitizedValue));
             }
 
             return this;
@@ -209,7 +212,7 @@ public class SignatureContext {
          *
          * @param headers A map of HTTP header names and values
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-10.html#name-http-fields">HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-http-fields">HTTP Fields</a>
          */
         public Builder headers(Map<String, ?> headers) {
             for (var entry : headers.entrySet()) {
@@ -228,6 +231,7 @@ public class SignatureContext {
 
         /**
          * Sets Signature Context of the Related Request
+         *
          * @param relatedRequestContext Related Request's Signature Context
          * @return This builder
          */
@@ -246,15 +250,11 @@ public class SignatureContext {
         }
 
         private String sanitizeHeaderValue(Object headerValue) {
-            if (headerValue != null) {
-                headerValue = Objects.toString(headerValue)
-                        .lines()
-                        .map(String::strip)
-                        .filter(str -> !str.isEmpty())
-                        .collect(Collectors.joining(" "));
-            }
-
-            return (String) headerValue;
+            return Objects.toString(headerValue)
+                    .lines()
+                    .map(String::strip)
+                    .filter(str -> !str.isEmpty())
+                    .collect(Collectors.joining(" "));
         }
     }
 
