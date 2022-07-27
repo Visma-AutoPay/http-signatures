@@ -170,7 +170,7 @@ try {
 #### Creating signature
 
 ##### Signature components
-For details, see [SignatureComponents.Builder](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/SignatureComponents.Builder.html)
+For details, see [SignatureComponents.Builder](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/signature/SignatureComponents.Builder.html)
 ```java
 var signatureComponents = SignatureComponents.builder()
         // Components derived from the request
@@ -201,7 +201,7 @@ var signatureComponents = SignatureComponents.builder()
 ```
 
 ##### Signature parameters
-For details, see [SignatureParameters.Builder](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/SignatureParameters.Builder.html)
+For details, see [SignatureParameters.Builder](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/signature/SignatureParameters.Builder.html)
 ```java
 var signatureParameters = SignatureParameters.builder()
         // Created parameter populated to now()
@@ -234,7 +234,7 @@ var signatureParameters = SignatureParameters.builder()
 ```
 
 ##### Signature context
-For details, see [SignatureContext.Builder](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/SignatureContext.Builder.html)
+For details, see [SignatureContext.Builder](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/signature/SignatureContext.Builder.html)
 ```java
 var requestContext = SignatureContext.builder()
         .method("POST")
@@ -257,7 +257,7 @@ var requestContext = SignatureContext.builder()
 ```
 
 ##### Signature specification
-For details, see [SignatureSpec.Builder](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/SignatureSpec.Builder.html)
+For details, see [SignatureSpec.Builder](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/signature/SignatureSpec.Builder.html)
 ```java
 var signatureSpec = SignatureSpec.builder()
         .signatureLabel("my-signature")
@@ -277,7 +277,7 @@ var signatureSpec = SignatureSpec.builder()
 ```
 
 ##### Signing
-For details, see [SignatureSpec.sign()](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/SignatureSpec.html#sign())
+For details, see [SignatureSpec.sign()](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/signature/SignatureSpec.html#sign())
 ```java
 try {
     var signature = signatureSpec.sign();
@@ -318,7 +318,7 @@ components.
 ##### Signature parameters
 
 Required parameters must be present in the verified signature.
-For full list, see [SignatureParameterType](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/SignatureParameterType.html)
+For full list, see [SignatureParameterType](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/signature/SignatureParameterType.html)
 ```java
 var requiredParameters = List.of(SignatureParameterType.KEY_ID, SignatureParameterType.CREATED, SignatureParameterType.NONCE);
 ```
@@ -336,8 +336,8 @@ var signatureContext = SignatureContext.builder()
 ```
 
 ##### Public key getter
-For details, see [PublicKeyInfo.Builder](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/PublicKeyInfo.Builder.html)
-and [VerificationSpec.Builder.publicKeyGetter()](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/VerificationSpec.Builder.html#publicKeyGetter(net.visma.autopay.http.signature.CheckedFunction))
+For details, see [PublicKeyInfo.Builder](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/signature/PublicKeyInfo.Builder.html)
+and [VerificationSpec.Builder.publicKeyGetter()](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/signature/VerificationSpec.Builder.html#publicKeyGetter(net.visma.autopay.http.signature.CheckedFunction))
 ```java
 // Exceptions thrown by the getter are used as the cause in Signature Exception
 // thrown when verifying
@@ -356,7 +356,7 @@ private PublicKeyInfo getPublicKey(String keyId) throws MyGetterException {
 ```
 
 ##### Verification specification
-For details, see [VerificationSpec.Builder](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/VerificationSpec.Builder.html)
+For details, see [VerificationSpec.Builder](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/signature/VerificationSpec.Builder.html)
 ```java
 var verificationSpec = VerificationSpec.builder()
         .signatureLabel("my-signature")
@@ -385,7 +385,7 @@ var verificationSpec = VerificationSpec.builder()
 ```
 
 ##### Verifying
-For details, see [VerificationSpec.verify()](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/VerificationSpec.html#verify())
+For details, see [VerificationSpec.verify()](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/signature/VerificationSpec.html#verify())
 ```java
 try {
     verificationSpec.verify();
@@ -441,7 +441,7 @@ See https://github.com/bcgit/bc-java/issues/751
 
 Values for `Content-Digest` header can be computed by using `DigestCalculator`
 class. Only "secure" algorithms are supported: `sha-256` and `sha-512`.
-For details, see [DigestCalculator.calculateDigestHeader()](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/digest/DigestCalculator.html#calculateDigestHeader(byte%5B%5D,net.visma.autopay.http.digest.DigestAlgorithm))
+For details, see [DigestCalculator.calculateDigestHeader()](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/digest/DigestCalculator.html#calculateDigestHeader(byte%5B%5D,net.visma.autopay.http.digest.DigestAlgorithm))
 ```java
 var jsonBody = objectMapper.writeValueAsBytes(requestOrResponseObject);
 var contentDigest = DigestCalculator.calculateDigestHeader(jsonBody, DigestAlgorithm.SHA_256);
@@ -449,7 +449,7 @@ httpHeaders.add(DigestHeaders.CONTENT_DIGEST, contentDigest);
 ```
 
 Digest algorithm can be chosen by using `Want-Content-Digest` header.
-For details, see [DigestCalculator.calculateDigestHeader()](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/digest/DigestCalculator.html#calculateDigestHeader(byte%5B%5D,java.lang.String))
+For details, see [DigestCalculator.calculateDigestHeader()](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/digest/DigestCalculator.html#calculateDigestHeader(byte%5B%5D,java.lang.String))
 ```java
 var jsonBody = objectMapper.writeValueAsBytes(requestOrResponseObject);
 var wantDigest = request.getHeader(DigestHeaders.WANT_CONTENT_DIGEST);
@@ -463,7 +463,7 @@ try {
 ```
 
 For verification, `DigestVerifier` can be used.
-For details, see [DigestVerifier.verifyDigestHeader()](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/digest/DigestVerifier.html#verifyDigestHeader(java.lang.String,byte%5B%5D))
+For details, see [DigestVerifier.verifyDigestHeader()](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/digest/DigestVerifier.html#verifyDigestHeader(java.lang.String,byte%5B%5D))
 ```java
 var jsonBody = objectMapper.writeValueAsBytes(requestOrResponseObject);
 var contentDigest = request.getHeader(DigestHeaders.CONTENT_DIGEST);
@@ -483,16 +483,16 @@ try {
 
 | Structured item | Java class                                                                                                                          | Internal storage                        |
 |-----------------|-------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------|
-| List            | [StructuredList](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/structured/StructuredList.html)             | List\<StructuredItem\>                  | 
-| Inner List      | [StructuredInnerList](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/structured/StructuredInnerList.html)   | List\<StructuredItem\>                  |
-| Parameters      | [StructuredParameters](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/structured/StructuredParameters.html) | LinkedHashMap\<String, StructuredItem\> |
-| Dictionary      | [StructuredDictionary](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/structured/StructuredDictionary.html) | LinkedHashMap\<String, StructuredItem\> |
-| Integer         | [StructuredInteger](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/structured/StructuredInteger.html)       | long                                    |
-| Decimal         | [StructuredDecimal](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/structured/StructuredDecimal.html)       | BigDecimal                              |
-| String          | [StructuredString](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/structured/StructuredString.html)         | String                                  |
-| Token           | [StructuredToken](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/structured/StructuredToken.html)           | String                                  |
-| Byte Sequence   | [StructuredBytes](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/structured/StructuredBytes.html)           | byte[]                                  |
-| Boolean         | [StructuredBoolean](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/structured/StructuredBoolean.html)       | boolean                                 |
+| List            | [StructuredList](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/structured/StructuredList.html)             | List\<StructuredItem\>                  | 
+| Inner List      | [StructuredInnerList](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/structured/StructuredInnerList.html)   | List\<StructuredItem\>                  |
+| Parameters      | [StructuredParameters](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/structured/StructuredParameters.html) | LinkedHashMap\<String, StructuredItem\> |
+| Dictionary      | [StructuredDictionary](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/structured/StructuredDictionary.html) | LinkedHashMap\<String, StructuredItem\> |
+| Integer         | [StructuredInteger](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/structured/StructuredInteger.html)       | long                                    |
+| Decimal         | [StructuredDecimal](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/structured/StructuredDecimal.html)       | BigDecimal                              |
+| String          | [StructuredString](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/structured/StructuredString.html)         | String                                  |
+| Token           | [StructuredToken](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/structured/StructuredToken.html)           | String                                  |
+| Byte Sequence   | [StructuredBytes](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/structured/StructuredBytes.html)           | byte[]                                  |
+| Boolean         | [StructuredBoolean](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/structured/StructuredBoolean.html)       | boolean                                 |
 
 
 ### Creating items
