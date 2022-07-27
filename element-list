@@ -1,3 +1,3 @@
-com.visma.autopay.http.digest
-com.visma.autopay.http.signature
-com.visma.autopay.http.structured
+net.visma.autopay.http.digest
+net.visma.autopay.http.signature
+net.visma.autopay.http.structured

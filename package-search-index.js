@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.visma.autopay.http.digest"},{"l":"com.visma.autopay.http.signature"},{"l":"com.visma.autopay.http.structured"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"net.visma.autopay.http.digest"},{"l":"net.visma.autopay.http.signature"},{"l":"net.visma.autopay.http.structured"}];updateSearchResults();
