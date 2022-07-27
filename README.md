@@ -337,7 +337,7 @@ var signatureContext = SignatureContext.builder()
 
 ##### Public key getter
 For details, see [PublicKeyInfo.Builder](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/PublicKeyInfo.Builder.html)
-and [VerificationSpec.Builder.publicKeyGetter()](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/VerificationSpec.Builder.html#publicKeyGetter(com.visma.autopay.http.signature.CheckedFunction))
+and [VerificationSpec.Builder.publicKeyGetter()](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/signature/VerificationSpec.Builder.html#publicKeyGetter(net.visma.autopay.http.signature.CheckedFunction))
 ```java
 // Exceptions thrown by the getter are used as the cause in Signature Exception
 // thrown when verifying
@@ -441,7 +441,7 @@ See https://github.com/bcgit/bc-java/issues/751
 
 Values for `Content-Digest` header can be computed by using `DigestCalculator`
 class. Only "secure" algorithms are supported: `sha-256` and `sha-512`.
-For details, see [DigestCalculator.calculateDigestHeader()](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/digest/DigestCalculator.html#calculateDigestHeader(byte%5B%5D,com.visma.autopay.http.digest.DigestAlgorithm))
+For details, see [DigestCalculator.calculateDigestHeader()](https://visma-autopay.github.io/http-signatures/com/visma/autopay/http/digest/DigestCalculator.html#calculateDigestHeader(byte%5B%5D,net.visma.autopay.http.digest.DigestAlgorithm))
 ```java
 var jsonBody = objectMapper.writeValueAsBytes(requestOrResponseObject);
 var contentDigest = DigestCalculator.calculateDigestHeader(jsonBody, DigestAlgorithm.SHA_256);
