@@ -15,6 +15,15 @@ It requires Java 11 or newer and does not have compile dependencies.
 
 Javadoc is available at https://visma-autopay.github.io/http-signatures/
 
+Maven dependency is
+```xml
+<dependency>
+    <groupId>net.visma.autopay</groupId>
+    <artifactId>http-signatures</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
 ## Introduction
 
 Consider the following HTTP request
