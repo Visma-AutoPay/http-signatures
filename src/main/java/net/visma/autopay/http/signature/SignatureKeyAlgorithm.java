@@ -36,7 +36,7 @@ enum SignatureKeyAlgorithm {
     RSA_PSS("RSASSA-PSS"),
 
     /**
-     * Elliptical curve
+     * Elliptic curve
      */
     EC("EC"),
 
