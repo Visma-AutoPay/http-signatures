@@ -32,21 +32,21 @@ import java.util.stream.Stream;
 /**
  * Signature algorithms
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-http-signature-algorithms-r">
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-http-signature-algorithms-r">
  *      HTTP Signature Algorithms Registry</a>
  */
 public enum SignatureAlgorithm {
     /**
      * RSASSA-PSS using SHA-512
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-rsassa-pss-using-sha-512">RSASSA-PSS using SHA-512</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-rsassa-pss-using-sha-512">RSASSA-PSS using SHA-512</a>
      */
     RSA_PSS_SHA_512("rsa-pss-sha512", "RSASSA-PSS", SignatureKeyAlgorithm.RSA, new PSSParameterSpec("SHA-512", "MGF1", MGF1ParameterSpec.SHA512, 64, 1)),
 
     /**
      * RSASSA-PKCS1-v1_5 using SHA-256
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-rsassa-pkcs1-v1_5-using-sha">
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-rsassa-pkcs1-v1_5-using-sha">
      *      RSASSA-PKCS1-v1_5 using SHA-256</a>
      */
     RSA_SHA_256("rsa-v1_5-sha256", "SHA256withRSA", SignatureKeyAlgorithm.RSA),
@@ -54,22 +54,30 @@ public enum SignatureAlgorithm {
     /**
      * HMAC using SHA-256
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-hmac-using-sha-256">HMAC using SHA-256</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-hmac-using-sha-256">HMAC using SHA-256</a>
      */
     HMAC_SHA_256("hmac-sha256", "HmacSHA256", SignatureKeyAlgorithm.HMAC),
 
     /**
      * ECDSA using curve P-256 DSS and SHA-256
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-ecdsa-using-curve-p-256-dss">
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-ecdsa-using-curve-p-256-dss">
      *      ECDSA using curve P-256 DSS and SHA-256</a>
      */
     ECDSA_P256_SHA_256("ecdsa-p256-sha256", "SHA256withECDSAinP1363Format", SignatureKeyAlgorithm.EC),
 
     /**
+     * ECDSA using curve P-384 DSS and SHA-384
+     *
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-ecdsa-using-curve-p-384-dss">
+     *      ECDSA using curve P-384 DSS and SHA-384</a>
+     */
+    ECDSA_P384_SHA_384("ecdsa-p384-sha384", "SHA384withECDSAinP1363Format", SignatureKeyAlgorithm.EC),
+
+    /**
      * Edwards Curve DSA using curve edwards25519
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-eddsa-using-curve-edwards25">
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-eddsa-using-curve-edwards25">
      *      EdDSA using curve edwards25519</a>
      */
     ED_25519("ed25519", "Ed25519", SignatureKeyAlgorithm.ED_25519),
@@ -102,7 +110,7 @@ public enum SignatureAlgorithm {
      *
      * @param identifier Algorithm identifier
      * @return Created SignatureAlgorithm
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-initial-contents">
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-initial-contents">
      *      Algorithm names in the Algorithms Registry</a>
      */
     static SignatureAlgorithm fromIdentifier(String identifier) {

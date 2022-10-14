@@ -31,10 +31,23 @@ class DataSignerTest {
     @Test
     void invalidKeyIsDetected() throws Exception {
         // setup
-        var privateKey = SignatureKeyFactory.decodePrivateKey(ObjectMother.getEcPrivateKey(), SignatureKeyAlgorithm.EC);
+        var privateKey = SignatureKeyFactory.decodePrivateKey(ObjectMother.getEc256PrivateKey(), SignatureKeyAlgorithm.EC);
 
         // execute
         var exception = catchThrowableOfType(() -> DataSigner.sign("text", privateKey, SignatureAlgorithm.RSA_SHA_256),
+                SignatureException.class);
+
+        // verify
+        assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_KEY);
+    }
+
+    @Test
+    void invalidEcKeySizeIsDetected() throws Exception {
+        // setup
+        var privateKey = SignatureKeyFactory.decodePrivateKey(ObjectMother.getEc256PrivateKey(), SignatureKeyAlgorithm.EC);
+
+        // execute
+        var exception = catchThrowableOfType(() -> DataSigner.sign("text", privateKey, SignatureAlgorithm.ECDSA_P384_SHA_384),
                 SignatureException.class);
 
         // verify

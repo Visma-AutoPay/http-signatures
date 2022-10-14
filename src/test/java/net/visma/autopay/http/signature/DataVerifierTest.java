@@ -31,10 +31,23 @@ class DataVerifierTest {
     @Test
     void invalidKeyIsDetected() throws Exception {
         // setup
-        var publicKey = SignatureKeyFactory.decodePublicKey(ObjectMother.getEcPublicKey(), SignatureKeyAlgorithm.EC);
+        var publicKey = SignatureKeyFactory.decodePublicKey(ObjectMother.getEc256PublicKey(), SignatureKeyAlgorithm.EC);
 
         // execute
         var exception = catchThrowableOfType(() -> DataVerifier.verify("text", new byte[] {1}, publicKey, SignatureAlgorithm.RSA_SHA_256),
+                SignatureException.class);
+
+        // verify
+        assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_KEY);
+    }
+
+    @Test
+    void invalidEcKeySizeIsDetected() throws Exception {
+        // setup
+        var publicKey = SignatureKeyFactory.decodePublicKey(ObjectMother.getEc384PublicKey(), SignatureKeyAlgorithm.EC);
+
+        // execute
+        var exception = catchThrowableOfType(() -> DataVerifier.verify("text", new byte[] {1}, publicKey, SignatureAlgorithm.ECDSA_P256_SHA_256),
                 SignatureException.class);
 
         // verify

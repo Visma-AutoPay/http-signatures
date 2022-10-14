@@ -37,7 +37,6 @@ import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
 import java.util.Base64;
 
-import static net.visma.autopay.http.signature.ObjectMother.getVerificationSpecBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
@@ -544,6 +543,86 @@ class SignatureVerifierTest {
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_DICTIONARY_KEY);
             assertThat(exception).hasMessageContaining("test");
+        }
+    }
+
+    @Nested
+    class ApplicationTagTest {
+        @Test
+        void signatureLabelIsCheckedWhenProvided() {
+            // setup
+            var verificationSpec = getVerificationSpec(null, "second");
+
+            // execute & verify
+            assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
+        }
+
+        @Test
+        void bothSignatureLabelAndTagAreCheckedWhenProvided() {
+            // setup
+            var verificationSpec = getVerificationSpec("dos", "second");
+
+            // execute & verify
+            assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
+        }
+
+        @Test
+        void multipleSignaturesMatchingTagAreDetected() {
+            // setup
+            var verificationSpec = getVerificationSpec(null, "first");
+
+            // execute
+            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+
+            // verify
+            assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.DUPLICATE_TAG);
+            assertThat(exception).hasMessageContaining("Multiple first tags");
+        }
+
+        @Test
+        void noSignatureMatchingTagIsDetected() {
+            // setup
+            var verificationSpec = getVerificationSpec(null, "third");
+
+            // execute
+            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+
+            // verify
+            assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_TAG);
+            assertThat(exception).hasMessageContaining("Missing third tag");
+        }
+
+        @Test
+        void signatureMatchingLabelButNotTagIsDetected() {
+            // setup
+            var verificationSpec = getVerificationSpec("uno", "fourth");
+
+            // execute
+            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+
+            // verify
+            assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_TAG);
+            assertThat(exception).hasMessageContaining("Missing fourth tag");
+        }
+
+        private VerificationSpec getVerificationSpec(String signatureLabel, String applicationTag) {
+            var signatureInput = "uno=();keyid=\"one\";tag=\"first\", dos0=();keyid=\"two\";tag=\"first\", dos=();keyid=\"two\";tag=\"second\"";
+            var signature = "uno=:ZdapoyEz/RbaQf9SBIh7Qk5sqzDfWyxKMMRkg6nDZazOD1kLIl44m0ds/Sgd1fiEVdJkS/0r8QAzGDckYh5KBg==:, " +
+                    "dos0=:BKyvE+j2+ZrB/6wzecAqIG1naIK4nHYyGzeE92HBR/RJn9ygQK73l81s3eC8Uto67GLZiiUYFlDXmbl++vp5AA==:, " +
+                    "dos=:BKyvE+j2+ZrB/6wzecAqIG1naIK4nHYyGzeE92HBR/RJn9ygQK73l81s3eC8Uto67GLZiiUYFlDXmbl++vp5AA==:";
+
+            return VerificationSpec.builder()
+                    .signatureLabel(signatureLabel)
+                    .applicationTag(applicationTag)
+                    .publicKeyGetter(keyId -> PublicKeyInfo.builder()
+                            .publicKey(ObjectMother.getEdPublicKey())
+                            .algorithm(SignatureAlgorithm.ED_25519)
+                            .build())
+                    .context(SignatureContext.builder()
+                            .header(SignatureHeaders.SIGNATURE_INPUT, signatureInput)
+                            .header(SignatureHeaders.SIGNATURE, signature)
+                            .build())
+                    .build();
         }
     }
 }

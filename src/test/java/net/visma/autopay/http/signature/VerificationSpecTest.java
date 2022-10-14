@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 
 class VerificationSpecTest {
@@ -91,5 +92,19 @@ class VerificationSpecTest {
         assertThat(spec1).isEqualTo(spec2)
                 .hasSameHashCodeAs(spec2)
                 .hasToString(spec2.toString());
+    }
+
+    @Test
+    void missingLabelAndTagIsDetected() {
+        // setup
+        var specBuilder = VerificationSpec.builder()
+                .context(SignatureContext.builder().build())
+                .publicKeyGetter((keyId) -> PublicKeyInfo.builder().build());
+
+        // execute
+        var exception = catchThrowableOfType(specBuilder::build, RuntimeException.class);
+
+        // verify
+        assertThat(exception).hasMessageContainingAll("signatureLabel", "applicationTag");
     }
 }

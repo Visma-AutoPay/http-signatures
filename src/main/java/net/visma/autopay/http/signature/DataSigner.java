@@ -26,9 +26,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Signature;
+import java.security.interfaces.ECKey;
 
 /**
  * Class for signing raw data
@@ -61,17 +63,36 @@ final class DataSigner {
         }
     }
 
-    private static byte[] signAsymmetric(byte[] data, PrivateKey key, SignatureAlgorithm algorithm) throws NoSuchAlgorithmException,
-            InvalidAlgorithmParameterException,
-            InvalidKeyException,
-            java.security.SignatureException {
+    /**
+     * Creates and populates parameters of {@link Signature} object. Checks if used elliptic curve matches the algorithm.
+     *
+     * @param key Public or private key to check
+     * @param algorithm Signature algorithm
+     * @return Created {@link Signature} object
+     * @throws InvalidKeyException EC key does not match the algorithm
+     * @throws NoSuchAlgorithmException Signature algorithm not found in JVM
+     * @throws InvalidAlgorithmParameterException Invalid signature parameter
+     */
+    static Signature createSignatureObject(Key key, SignatureAlgorithm algorithm) throws InvalidKeyException, NoSuchAlgorithmException,
+            InvalidAlgorithmParameterException {
+        if (key instanceof ECKey) {
+            EllipticCurveValidator.validate((ECKey) key, algorithm);
+        }
+
         var signatureObject = Signature.getInstance(algorithm.getJvmName());
 
         if (algorithm.getParameterSpec() != null) {
             signatureObject.setParameter(algorithm.getParameterSpec());
         }
 
-        signatureObject.initSign(key);
+        return signatureObject;
+    }
+
+    private static byte[] signAsymmetric(byte[] data, PrivateKey privateKey, SignatureAlgorithm algorithm) throws NoSuchAlgorithmException,
+            InvalidAlgorithmParameterException, InvalidKeyException, java.security.SignatureException {
+
+        var signatureObject = createSignatureObject(privateKey, algorithm);
+        signatureObject.initSign(privateKey);
         signatureObject.update(data);
 
         return signatureObject.sign();

@@ -36,6 +36,7 @@ import java.util.Set;
  *     <li>Signature context containing values for defined components. Copied from verified request or response.</li>
  *     <li>Public key supplier</li>
  *     <li>Signature label</li>
+ *     <li>Application-specific tag</li>
  *     <li>Limits for signature creation time</li>
  * </ul>
  *
@@ -54,12 +55,13 @@ public class VerificationSpec {
     private final Integer maximumSkewSeconds;
     private final CheckedFunction<String, PublicKeyInfo> publicKeyGetter;
     private final String signatureLabel;
+    private final String applicationTag;
 
 
     private VerificationSpec(Set<SignatureParameterType> requiredParameters, Set<SignatureParameterType> forbiddenParameters,
                              SignatureComponents requiredComponents, SignatureComponents requiredIfPresentComponents, SignatureContext signatureContext,
                              Integer maximumAgeSeconds, Integer maximumSkewSeconds, CheckedFunction<String, PublicKeyInfo> publicKeyGetter,
-                             String signatureLabel) {
+                             String signatureLabel, String applicationTag) {
         this.requiredParameters = requiredParameters;
         this.forbiddenParameters = forbiddenParameters;
         this.requiredComponents = requiredComponents;
@@ -69,6 +71,7 @@ public class VerificationSpec {
         this.maximumSkewSeconds = maximumSkewSeconds;
         this.publicKeyGetter = publicKeyGetter;
         this.signatureLabel = signatureLabel;
+        this.applicationTag = applicationTag;
     }
 
     /**
@@ -76,7 +79,7 @@ public class VerificationSpec {
      *
      * @throws SignatureException Incorrect signature or problems with verification, e.g. missing or malformatted values in Signature Context, problems with the
      *                            public key. For detailed reason call {@link SignatureException#getErrorCode()}.
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-verifying-a-signature">Verifying a Signature</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-verifying-a-signature">Verifying a Signature</a>
      */
     public void verify() throws SignatureException {
         SignatureVerifier.verify(this);
@@ -169,6 +172,15 @@ public class VerificationSpec {
     }
 
     /**
+     * Returns application-specific tag
+     *
+     * @return Tag of signature to verify
+     */
+    String getApplicationTag() {
+        return applicationTag;
+    }
+
+    /**
      * Returns a builder used to construct {@link VerificationSpec} object
      *
      * @return A VerificationSpec builder
@@ -194,6 +206,7 @@ public class VerificationSpec {
         private Integer maximumSkewSeconds;
         private CheckedFunction<String, PublicKeyInfo> publicKeyGetter;
         private String signatureLabel;
+        private String applicationTag;
 
 
         private Builder() {
@@ -338,12 +351,35 @@ public class VerificationSpec {
          * <p>
          * <em>Signature</em> and <em>Signature-Input</em> headers will be searched for provided label. If they don't contain the label, signature verification
          * will be rejected.
+         * <p>
+         * If application-specific {{@link #applicationTag(String)}} is also provided then found signature must contain both the label and the tag.
+         * If <em>signatureLabel</em> is not provided then only {@link #applicationTag(String)} is used to find matching signature.
+         * Either <em>signatureLabel</em> or <em>applicationTag</em> must be provided in verification specs.
          *
          * @param signatureLabel Label of signature to verify
          * @return This builder
          */
         public Builder signatureLabel(String signatureLabel) {
             this.signatureLabel = signatureLabel;
+            return this;
+        }
+
+        /**
+         * Sets application-specific tag of signature to verify
+         * <p>
+         * <em>Signature-Input</em> header will be searched for provided tag. If it doesn't contain the tag, signature verification
+         * will be rejected. If multiple signatures contain the tag, signature verification will be rejected.
+         * <p>
+         * If {{@link #signatureLabel(String)} is also provided then found signature must contain both the label and the tag.
+         * (In this case multiple signatures having the tag won't lead to rejection.)
+         * If <em>tag</em> is not provided then only {@link #signatureLabel(String)} is used to find matching signature.
+         * Either <em>signatureLabel</em> or <em>applicationTag</em> must be provided in verification specs.
+         *
+         * @param tag Application-specific tag of signature to verify
+         * @return This builder
+         */
+        public Builder applicationTag(String tag) {
+            this.applicationTag = tag;
             return this;
         }
 
@@ -357,7 +393,10 @@ public class VerificationSpec {
         public VerificationSpec build() {
             Objects.requireNonNull(signatureContext, "SignatureContext not provided");
             Objects.requireNonNull(publicKeyGetter, "PublicKeyGetter not provided");
-            Objects.requireNonNull(signatureLabel, "SignatureLabel not provided");
+
+            if (signatureLabel == null && applicationTag == null) {
+                throw new NullPointerException("Both signatureLabel and applicationTag not provided. One of them is required.");
+            }
 
             if (requiredComponents == null) {
                 requiredComponents = SignatureComponents.builder().build();
@@ -368,7 +407,7 @@ public class VerificationSpec {
             }
 
             return new VerificationSpec(requiredParameters, forbiddenParameters, requiredComponents, requiredIfPresentComponents, signatureContext,
-                    maximumAgeSeconds, maximumSkewSeconds, publicKeyGetter, signatureLabel);
+                    maximumAgeSeconds, maximumSkewSeconds, publicKeyGetter, signatureLabel, applicationTag);
         }
     }
 

@@ -119,23 +119,44 @@ final class ObjectMother {
                 "-----END PRIVATE KEY-----\n";
     }
 
-    static String getEcKeyId() {
+    static String getEc256KeyId() {
         return "test-key-ecc-p256";
     }
 
-    static String getEcPublicKey() {
+    static String getEc256PublicKey() {
         return "-----BEGIN PUBLIC KEY-----\n" +
                 "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEqIVYZVLCrPZHGHjP17CTW0/+D9Lf\n" +
                 "w0EkjqF7xB4FivAxzic30tMM4GF+hR6Dxh71Z50VGGdldkkDXZCnTNnoXQ==\n" +
                 "-----END PUBLIC KEY-----\n";
     }
 
-    static String getEcPrivateKey() {
+    static String getEc256PrivateKey() {
         return "-----BEGIN PRIVATE KEY-----\n" +
                 "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgUpuF81l+kOxbjf7T\n" +
                 "4mNSv0r5tN67Gim7rnf6EFpcYDuhRANCAASohVhlUsKs9kcYeM/XsJNbT/4P0t/D\n" +
                 "QSSOoXvEHgWK8DHOJzfS0wzgYX6FHoPGHvVnnRUYZ2V2SQNdkKdM2ehd\n" +
                 "-----END PRIVATE KEY-----\n";
+    }
+
+    static String getEc384KeyId() {
+        return "test-key-ecc-p384";
+    }
+
+    static String getEc384PublicKey() {
+        return "-----BEGIN PUBLIC KEY-----\n" +
+                "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEdFQXRzP/9jGu0Iqb268BgIgYipmsi8wt\n" +
+                "P4zoUGl2a0oyUtw/YYvY8QaYaza7KmpmvLZmFbqLPlausHGhzb9C2CFX1GcRozvp\n" +
+                "z8nr4H6zwZJiIJAfk4FLtYksn66TqN2B\n" +
+                "-----END PUBLIC KEY-----";
+    }
+
+    static String getEc384PrivateKey() {
+        return "-----BEGIN PRIVATE KEY-----\n" +
+                "MIG2AgEAMBAGByqGSM49AgEGBSuBBAAiBIGeMIGbAgEBBDCZmO4VHF/r9ZXsNSoq\n" +
+                "mkW1QIRDLh1WAeLwO/ajPRKhaaUklLdsU2QQ0UqrMPUCvkqhZANiAAR0VBdHM//2\n" +
+                "Ma7QipvbrwGAiBiKmayLzC0/jOhQaXZrSjJS3D9hi9jxBphrNrsqama8tmYVuos+\n" +
+                "Vq6wcaHNv0LYIVfUZxGjO+nPyevgfrPBkmIgkB+TgUu1iSyfrpOo3YE=\n" +
+                "-----END PRIVATE KEY-----";
     }
 
     static String getEdKeyId() {

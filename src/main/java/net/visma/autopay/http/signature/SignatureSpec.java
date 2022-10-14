@@ -64,7 +64,7 @@ public class SignatureSpec {
      *         logging or debugging
      * @throws SignatureException Problems with signature calculation, e.g. missing or malformatted values in Signature Context, problems with the private key.
      *                            For detailed reason call {@link SignatureException#getErrorCode()}.
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-creating-a-signature">Creating a Signature</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-creating-a-signature">Creating a Signature</a>
      */
     public SignatureResult sign() throws SignatureException {
         return SignatureSigner.sign(this);
@@ -119,7 +119,7 @@ public class SignatureSpec {
      * Returns signature label
      *
      * @return Signature label
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-signature-labels">Signature Labels</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-signature-labels">Signature Labels</a>
      */
     String getSignatureLabel() {
         return signatureLabel;
@@ -212,6 +212,8 @@ public class SignatureSpec {
          */
         public Builder privateKey(PrivateKey privateKey) {
             this.privateKey = privateKey;
+            this.bytePrivateKey = null;
+            this.stringPrivateKey = null;
             return this;
         }
 
@@ -223,6 +225,8 @@ public class SignatureSpec {
          */
         public Builder privateKey(byte[] privateKey) {
             this.bytePrivateKey = privateKey;
+            this.privateKey = null;
+            this.stringPrivateKey = null;
             return this;
         }
 
@@ -236,6 +240,8 @@ public class SignatureSpec {
          */
         public Builder privateKey(String privateKey) {
             this.stringPrivateKey = privateKey;
+            this.privateKey = null;
+            this.bytePrivateKey = null;
             return this;
         }
 
@@ -244,7 +250,7 @@ public class SignatureSpec {
          *
          * @param signatureLabel Signature label
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-signature-labels">Signature Labels</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-signature-labels">Signature Labels</a>
          */
         public Builder signatureLabel(String signatureLabel) {
             this.signatureLabel = signatureLabel;

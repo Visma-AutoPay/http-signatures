@@ -5,8 +5,8 @@ authenticity for components of an HTTP message.
 
 This library provides a high-level Java interface for creating and verifying
 signatures as defined in the
-[HTTP Message Signatures specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html)
-(draft 11). As by-products, it implements
+[HTTP Message Signatures specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html)
+(draft 13). As by-products, it implements
 [Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html)
 (draft 10) and
 [Structured Field Values for HTTP](https://www.rfc-editor.org/rfc/rfc8941).
@@ -20,7 +20,7 @@ Maven dependency is
 <dependency>
     <groupId>net.visma.autopay</groupId>
     <artifactId>http-signatures</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -46,7 +46,7 @@ and `Signature` headers.
 included, what key is used
 - `Signature` - Concatenated request parts defined in the input are signed by
 using the referenced key. Both Signature-Input and Signature are defined by
-[HTTP Message Signatures](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html).
+[HTTP Message Signatures](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html).
 - Syntax - Those headers are formatted by using the syntax of
 [Structured Field Values for HTTP](https://www.rfc-editor.org/rfc/rfc8941)
 
@@ -239,6 +239,9 @@ var signatureParameters = SignatureParameters.builder()
 
         // Key ID
         .keyId("test-key-ed25519")
+        
+        // Tag
+        .tag("app-gateway")
         .build();
 ```
 
@@ -368,7 +371,12 @@ private PublicKeyInfo getPublicKey(String keyId) throws MyGetterException {
 For details, see [VerificationSpec.Builder](https://visma-autopay.github.io/http-signatures/net/visma/autopay/http/signature/VerificationSpec.Builder.html)
 ```java
 var verificationSpec = VerificationSpec.builder()
+        // Used to select desired signature from potentially multiple ones.
+        // Either label or tag must be provided. If both are present then both
+        // are used.
         .signatureLabel("my-signature")
+        .applicationTag("app-gateway")
+        
         .requiredComponents(requiredComponents)
         .requiredIfPresentComponents(requiredIfPresentComponents)
         
@@ -424,8 +432,9 @@ Support for Edwards-Curve signatures (`SignatureAlgorithm.ED_25519`, `Ed25519`)
 was added to JRE in Java 15. For older JREs, a third-party provider must be
 used.
 
-As [ECDSA signatures require IEEE P1363 format (raw)](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-ecdsa-using-curve-p-256-dss),
-algorithm `SHA256withECDSAinP1363Format` is used rather than `SHA256withECDSA`.
+As [ECDSA signatures require IEEE P1363 format (raw)](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-ecdsa-using-curve-p-256-dss),
+algorithm `SHA256withECDSAinP1363Format` is used rather than `SHA256withECDSA`
+(and `SHA384withECDSAinP1363Format` rather than `SHA384withECDSA`).
 If your provider uses a different name, like Bouncy Castle's
 `SHA256withPLAIN-ECDSA`, then a delegate must be implemented.
 
@@ -435,6 +444,7 @@ public class BouncyCastleP1363Provider extends Provider {
         super("BcP1363", "1.0", "Bouncy Castle - P1363 Bridge");
         // org.bouncycastle.jcajce.provider.asymmetric.ec.SignatureSpi
         put("Signature.SHA256withECDSAinP1363Format", SignatureSpi.ecCVCDSA256.class.getName());
+        put("Signature.SHA384withECDSAinP1363Format", SignatureSpi.ecCVCDSA384.class.getName());
     }
 }
 
