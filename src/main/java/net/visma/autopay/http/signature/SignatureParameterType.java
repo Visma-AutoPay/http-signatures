@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 /**
  * Defines types of Signature Parameters
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-signature-parameters">Signature Parameters</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-signature-parameters">Signature Parameters</a>
  */
 public enum SignatureParameterType {
     /**
@@ -55,6 +55,12 @@ public enum SignatureParameterType {
      * keyid - the identifier for the key material as a String value
      */
     KEY_ID("keyid"),
+
+    /**
+     * An application-specific tag for the signature as a String value. This value is used by applications to help identify
+     * signatures relevant for specific applications or protocols.
+     */
+    TAG("tag"),
     ;
 
     private final String identifier;

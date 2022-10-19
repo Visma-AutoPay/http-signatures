@@ -28,76 +28,76 @@ import java.util.stream.Stream;
 /**
  * Defines types of Derived Components
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-derived-components">Derived Components</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-derived-components">Derived Components</a>
  */
 enum DerivedComponentType {
     /**
      * &#64;signature-params - the signature metadata parameters
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#signature-params">Signature Parameters</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#signature-params">Signature Parameters</a>
      */
     SIGNATURE_PARAMS("@signature-params"),
 
     /**
      * &#64;method - the method used for a request
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#content-request-method">Method</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-method">Method</a>
      */
     METHOD("@method"),
 
     /**
      * &#64;target-uri - the full target URI for a request
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#content-target-uri">Target URI</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-target-uri">Target URI</a>
      */
     TARGET_URI("@target-uri"),
 
     /**
      * &#64;authority - the authority (host) of the target URI for a request
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#content-request-authority">Authority</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-authority">Authority</a>
      */
     AUTHORITY("@authority"),
 
     /**
      * &#64;scheme - the scheme of the target URI for a request
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#content-request-scheme">Scheme</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-scheme">Scheme</a>
      */
     SCHEME("@scheme"),
 
     /**
      * &#64;request-target - the request target
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#content-request-target">Request Target</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-target">Request Target</a>
      */
     REQUEST_TARGET("@request-target"),
 
     /**
      * &#64;path - the absolute path portion of the target URI for a request
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#content-request-path">Path</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-path">Path</a>
      */
     PATH("@path"),
 
     /**
      * &#64;query - the query portion of the target URI for a request
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#content-request-query">Query</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-query">Query</a>
      */
     QUERY("@query"),
 
     /**
      * &#64;query-param - a parsed query parameter of the target URI for a request
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#content-request-query-param">Query Parameters</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-query-param">Query Parameters</a>
      */
     QUERY_PARAM("@query-param"),
 
     /**
      * &#64;status - the status code for a response
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#content-status-code">Status Code</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-status-code">Status Code</a>
      */
     STATUS("@status"),
     ;

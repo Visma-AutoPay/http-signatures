@@ -150,6 +150,16 @@ public class SignatureException extends Exception {
         FORBIDDEN_PRESENT,
 
         /**
+         * Signature with requested <em>tag</em> not found when verifying
+         */
+        MISSING_TAG,
+
+        /**
+         * Found multiple signatures with requested <em>tag</em> when verifying
+         */
+        DUPLICATE_TAG,
+
+        /**
          * Generic security problem. Relates to {@link java.security.GeneralSecurityException}.
          */
         GENERIC,

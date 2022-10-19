@@ -28,7 +28,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.Signature;
 import java.util.Arrays;
 
 /**
@@ -70,12 +69,7 @@ final class DataVerifier {
     private static boolean verifyAsymmetric(byte[] data, byte[] signature, PublicKey publicKey, SignatureAlgorithm algorithm)
             throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, java.security.SignatureException {
 
-        var signatureObject = Signature.getInstance(algorithm.getJvmName());
-
-        if (algorithm.getParameterSpec() != null) {
-            signatureObject.setParameter(algorithm.getParameterSpec());
-        }
-
+        var signatureObject = DataSigner.createSignatureObject(publicKey, algorithm);
         signatureObject.initVerify(publicKey);
         signatureObject.update(data);
 

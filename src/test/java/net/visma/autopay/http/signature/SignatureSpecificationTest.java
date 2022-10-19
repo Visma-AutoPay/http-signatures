@@ -22,6 +22,7 @@
 package net.visma.autopay.http.signature;
 
 import net.visma.autopay.http.structured.StructuredDictionary;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.SignatureSpi;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.security.Provider;
 import java.security.Security;
 import java.time.Instant;
 import java.util.Base64;
@@ -140,8 +142,14 @@ class SignatureSpecificationTest {
         var signatureLabel = "sig-b22";
         var keyId = ObjectMother.getRsaPssKeyId();
         var algorithm = SignatureAlgorithm.RSA_PSS_SHA_512;
+        var tag = "header-example";
 
-        SignatureParameters signatureParams = getSignatureParameters(keyId, algorithm);
+        SignatureParameters signatureParams = SignatureParameters.builder()
+                .created(1618884473)
+                .keyId(keyId)
+                .tag(tag)
+                .algorithm(algorithm)
+                .build();
         var signatureComponents = SignatureComponents.builder()
                 .authority()
                 .header("Content-Digest")
@@ -158,7 +166,8 @@ class SignatureSpecificationTest {
                 .algorithm(algorithm)
                 .publicKey(ObjectMother.getRsaPssPublicKey())
                 .build();
-        var expectedSignatureInput = "sig-b22=(\"@authority\" \"content-digest\" \"@query-param\";name=\"Pet\");created=1618884473;keyid=\"test-key-rsa-pss\"";
+        var expectedSignatureInput = "sig-b22=(\"@authority\" \"content-digest\" \"@query-param\";name=\"Pet\");created=1618884473;keyid=\"test-key-rsa-pss\"" +
+                ";tag=\"header-example\"";
 
         // execute
         var signatureResult = signatureSpec.sign();
@@ -171,12 +180,12 @@ class SignatureSpecificationTest {
         verificationSpec.verify();
 
         // verify example signature
-        var validSignature = "sig-b22=:W2kxR52X0tXN9u7yjyPeWa0T3D0SVG8KkPo+lOWyb2TGdLz"
-                + "ixWjUlbehjnNhzA+wFWnE6+hdKH8KR6Z9FvsxCc+44XrqxzT7Vcsror5SjMyfx6Nq"
-                + "tELklj1u2L4JovANI80BSoVobSoc+v9NRVWJZU7WAVow8H2CucCcv2cy1tKFCTMyc"
-                + "m9LQrIz63Tg5tcGWj64b12nmwj9TwwkCygfz0MTyIytjYLVzKw7mXpL4jGFZ5lsw2"
-                + "VT2eB3qpF2d/Psy0p1heKhrkz9uvKeCoj+P5QjLMS4eirHDqpKqe9YmCaMsJAUYSU"
-                + "M86qC8qO6vMQhTMegTkEe25DquVcTiOAEAw==:";
+        var validSignature = "sig-b22=:LjbtqUbfmvjj5C5kr1Ugj4PmLYvx9wVjZvD9GsTT4F7GrcQ" +
+                "EdJzgI9qHxICagShLRiLMlAJjtq6N4CDfKtjvuJyE5qH7KT8UCMkSowOB4+ECxCmT" +
+                "8rtAmj/0PIXxi0A0nxKyB09RNrCQibbUjsLS/2YyFYXEu4TRJQzRw1rLEuEfY17SA" +
+                "RYhpTlaqwZVtR8NV7+4UKkjqpcAoFqWFQh62s7Cl+H2fjBSpqfZUJcsIk4N6wiKYd" +
+                "4je2U/lankenQ99PZfB4jY3I5rSV2DSBVkSFsURIjYErOs0tFTQosMTAoxk//0RoK" +
+                "UqiYY8Bh0aaUEb0rQl3/XaVe4bXTugEjHSw==:";
         verificationSpec = getVerificationSpec(signatureLabel, keyId, publicKeyInfo, expectedSignatureInput, validSignature);
         verificationSpec.verify();
     }
@@ -234,7 +243,7 @@ class SignatureSpecificationTest {
     void signingResponseEcdsaP256Sha256() throws Exception {
         // setup
         var signatureLabel = "sig-b24";
-        var keyId = ObjectMother.getEcKeyId();
+        var keyId = ObjectMother.getEc256KeyId();
         var algorithm = SignatureAlgorithm.ECDSA_P256_SHA_256;
         requestHeaders = Map.of(
                 "Date", "Tue, 20 Apr 2021 02:07:56 GMT",
@@ -253,14 +262,14 @@ class SignatureSpecificationTest {
                 .build();
         var signatureSpec = SignatureSpec.builder()
                 .signatureLabel(signatureLabel)
-                .privateKey(ObjectMother.getEcPrivateKey())
+                .privateKey(ObjectMother.getEc256PrivateKey())
                 .context(requestContext)
                 .parameters(signatureParams)
                 .components(signatureComponents)
                 .build();
         var publicKeyInfo = PublicKeyInfo.builder()
                 .algorithm(algorithm)
-                .publicKey(ObjectMother.getEcPublicKey())
+                .publicKey(ObjectMother.getEc256PublicKey())
                 .build();
         var expectedSignatureInput = "sig-b24=(\"@status\" \"content-type\" \"content-digest\" \"content-length\");created=1618884473;" +
                 "keyid=\"test-key-ecc-p256\"";
@@ -277,6 +286,59 @@ class SignatureSpecificationTest {
 
         // verify example signature
         var validSignature = "sig-b24=:wNmSUAhwb5LxtOtOpNa6W5xj067m5hFrj0XQ4fvpaCLx0NKocgPquLgyahnzDnDAUy5eCdlYUEkLIj+32oiasw==:";
+        verificationSpec = getVerificationSpec(signatureLabel, keyId, publicKeyInfo, signatureResult.getSignatureInput(), validSignature);
+        verificationSpec.verify();
+    }
+
+    @Test
+    @DisplayName("Signing a Response using ecdsa-p384-sha384")
+    void signingResponseEcdsaP384Sha384() throws Exception {
+        // setup
+        var signatureLabel = "sig-b24a";
+        var keyId = ObjectMother.getEc384KeyId();
+        var algorithm = SignatureAlgorithm.ECDSA_P384_SHA_384;
+        requestHeaders = Map.of(
+                "Date", "Tue, 20 Apr 2021 02:07:56 GMT",
+                "Content-Type", "application/json",
+                "Content-Digest", "sha-512=:mEWXIS7MaLRuGgxOBdODa3xqM1XdEvxoYhvlCFJ41QJgJc4GTsPp29l5oGX69wWdXymyU0rjJuahq4l5aGgfLQ==:",
+                "Content-Length", "23"
+        );
+        requestContext = SignatureContext.builder()
+                .status(responseStatus)
+                .headers(requestHeaders)
+                .build();
+        SignatureParameters signatureParams = getSignatureParameters(keyId, algorithm);
+        var signatureComponents = SignatureComponents.builder()
+                .status()
+                .headers("Content-Type", "Content-Digest", "Content-Length")
+                .build();
+        var signatureSpec = SignatureSpec.builder()
+                .signatureLabel(signatureLabel)
+                .privateKey(ObjectMother.getEc384PrivateKey())
+                .context(requestContext)
+                .parameters(signatureParams)
+                .components(signatureComponents)
+                .build();
+        var publicKeyInfo = PublicKeyInfo.builder()
+                .algorithm(algorithm)
+                .publicKey(ObjectMother.getEc384PublicKey())
+                .build();
+        var expectedSignatureInput = "sig-b24a=(\"@status\" \"content-type\" \"content-digest\" \"content-length\");created=1618884473;" +
+                "keyid=\"test-key-ecc-p384\"";
+
+        // execute
+        var signatureResult = signatureSpec.sign();
+
+        // verify signature input
+        assertThat(signatureResult.getSignatureInput()).isEqualTo(expectedSignatureInput);
+
+        // verify self signature
+        var verificationSpec = getVerificationSpec(signatureLabel, keyId, publicKeyInfo, signatureResult);
+        verificationSpec.verify();
+
+        // verify example signature
+        var validSignature = "sig-b24a=:baHYylvLrO/oP/gozq3wlBvU3GjV9e7/HEx+VuzLUshMX0ghKAfPvccYpL1" +
+                "PEFROU77G4fQfy/TcYicBC22aIk3o8c0M1S3f1K/6lAZAhIFUflun77r33Pn2weHlwN8v:";
         verificationSpec = getVerificationSpec(signatureLabel, keyId, publicKeyInfo, signatureResult.getSignatureInput(), validSignature);
         verificationSpec.verify();
     }
@@ -374,7 +436,7 @@ class SignatureSpecificationTest {
     void tlsTerminatingProxies() throws Exception {
         // setup
         var signatureLabel = "ttrp";
-        var keyId = ObjectMother.getEcKeyId();
+        var keyId = ObjectMother.getEc256KeyId();
         var algorithm = SignatureAlgorithm.ECDSA_P256_SHA_256;
         requestUri = "https://service.internal.example/foo?param=Value&Pet=dog";
 
@@ -400,14 +462,14 @@ class SignatureSpecificationTest {
                 .build();
         var signatureSpec = SignatureSpec.builder()
                 .signatureLabel(signatureLabel)
-                .privateKey(ObjectMother.getEcPrivateKey())
+                .privateKey(ObjectMother.getEc256PrivateKey())
                 .context(responseContext)
                 .parameters(signatureParams)
                 .components(signatureComponents)
                 .build();
         var publicKeyInfo = PublicKeyInfo.builder()
                 .algorithm(algorithm)
-                .publicKey(ObjectMother.getEcPublicKey())
+                .publicKey(ObjectMother.getEc256PublicKey())
                 .build();
         var expectedSignatureInput = "ttrp=(\"@path\" \"@query\" \"@method\" \"@authority\" \"client-cert\");created=1618884473;keyid=\"test-key-ecc-p256\"";
 
@@ -433,7 +495,7 @@ class SignatureSpecificationTest {
         // setup
         var requestSignatureLabel = "sig1";
         var signatureLabel = "reqres";
-        var keyId = ObjectMother.getEcKeyId();
+        var keyId = ObjectMother.getEc256KeyId();
         var algorithm = SignatureAlgorithm.ECDSA_P256_SHA_256;
         responseStatus = 503;
 
@@ -465,14 +527,14 @@ class SignatureSpecificationTest {
                 .build();
         var signatureSpec = SignatureSpec.builder()
                 .signatureLabel(signatureLabel)
-                .privateKey(ObjectMother.getEcPrivateKey())
+                .privateKey(ObjectMother.getEc256PrivateKey())
                 .context(requestContext)
                 .parameters(signatureParams)
                 .components(signatureComponents)
                 .build();
         var publicKeyInfo = PublicKeyInfo.builder()
                 .algorithm(algorithm)
-                .publicKey(ObjectMother.getEcPublicKey())
+                .publicKey(ObjectMother.getEc256PublicKey())
                 .build();
         var expectedSignatureInput = "reqres=(\"@status\" \"content-length\" \"content-type\" \"signature\";req;key=\"sig1\");created=1618884479;" +
                 "keyid=\"test-key-ecc-p256\"";
@@ -565,19 +627,30 @@ class SignatureSpecificationTest {
         @BeforeEach
         void setUp() {
             Security.insertProviderAt(new BouncyCastleProvider(), 1);
+            Security.insertProviderAt(new BouncyCastleP1363Provider(), 1);
         }
 
         @AfterEach
         void tearDown() {
             Security.removeProvider("BC");
+            Security.removeProvider("BcP1363");
         }
 
         @ParameterizedTest
         @ValueSource(strings = {"minimalSignatureRsaPss", "selectiveCoveredComponentsRsaPss", "fullCoverageRsaPss", "signingResponseEcdsaP256Sha256",
-                "signingRequestHmacSha256", "signingRequestEd25519", "tlsTerminatingProxies", "requestResponseBinding", "multipleSignatures"})
+                "signingResponseEcdsaP384Sha384", "signingRequestHmacSha256", "signingRequestEd25519", "tlsTerminatingProxies", "requestResponseBinding",
+                "multipleSignatures"})
         void bouncyCastle(String methodName) throws Exception {
             var method = SignatureSpecificationTest.class.getDeclaredMethod(methodName);
             assertThatCode(() -> method.invoke(SignatureSpecificationTest.this)).doesNotThrowAnyException();
+        }
+    }
+
+    private static class BouncyCastleP1363Provider extends Provider {
+        public BouncyCastleP1363Provider() {
+            super("BcP1363", "1.0", "Bouncy Castle - P1363 Bridge");
+            put("Signature.SHA256withECDSAinP1363Format", SignatureSpi.ecCVCDSA256.class.getName());
+            put("Signature.SHA384withECDSAinP1363Format", SignatureSpi.ecCVCDSA384.class.getName());
         }
     }
 

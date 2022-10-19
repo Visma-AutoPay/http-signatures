@@ -29,7 +29,7 @@ import net.visma.autopay.http.structured.StructuredString;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 final class SignatureVerifier {
     private final VerificationSpec verificationSpec;
     private StructuredInnerList signatureInput;
+    private String signatureLabel;
     private SignatureParameters signatureParameters;
     private SignatureContext signatureContext;
 
@@ -48,7 +49,7 @@ final class SignatureVerifier {
      * @param verificationSpec Verification specification: parameters, components, context of HTTP request or response, public key supplier, signature label
      * @throws SignatureException Incorrect signature or problems with verification, e.g. missing or malformatted values in Signature Context, problems with the
      *                            public key. For detailed reason call {@link SignatureException#getErrorCode()}.
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-verifying-a-signature">Verifying a Signature</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-verifying-a-signature">Verifying a Signature</a>
      */
     static void verify(VerificationSpec verificationSpec) throws SignatureException {
         new SignatureVerifier(verificationSpec).verify();
@@ -60,8 +61,8 @@ final class SignatureVerifier {
 
     private void verify() throws SignatureException {
         signatureContext = verificationSpec.getSignatureContext();
-        signatureInput = getSignatureInput();
-        signatureParameters = getSignatureParameters();
+        populateSignatureInput();
+        populateSignatureParameters();
         verifyUniqueness();
         verifyRequired();
         verifyForbidden();
@@ -103,27 +104,65 @@ final class SignatureVerifier {
         }
     }
 
-    private StructuredInnerList getSignatureInput() throws SignatureException {
+    private void populateSignatureInput() throws SignatureException {
         var header = signatureContext.getHeaders().get(SignatureHeaders.SIGNATURE_INPUT.toLowerCase());
-        StructuredDictionary inputDictionary;
-        Optional<StructuredInnerList> optionalSignatureInput;
+        var requestedLabel = verificationSpec.getSignatureLabel();
+        var requestedTag = verificationSpec.getApplicationTag();
 
         if (header == null) {
             throw new SignatureException(ErrorCode.MISSING_HEADER, "Missing Signature-Input header");
         }
 
         try {
-            inputDictionary = StructuredDictionary.parse(header);
-            optionalSignatureInput = inputDictionary.getItem(verificationSpec.getSignatureLabel(), StructuredInnerList.class);
+            var inputDictionary = StructuredDictionary.parse(header);
+
+            if (requestedLabel != null) {
+                signatureInput = getSignatureInputByLabelAndTag(inputDictionary, requestedLabel, requestedTag);
+                signatureLabel = requestedLabel;
+            } else {
+                var inputEntry = getSignatureInputByTag(inputDictionary, requestedTag);
+                signatureInput = inputEntry.getValue();
+                signatureLabel = inputEntry.getKey();
+            }
+        } catch (SignatureException e) {
+            throw e;
         } catch (Exception e) {
             throw new SignatureException(ErrorCode.INVALID_STRUCTURED_HEADER, "Unable to parse Signature-Input header", e);
         }
+    }
 
-        if (optionalSignatureInput.isEmpty()) {
-            throw new SignatureException(ErrorCode.MISSING_DICTIONARY_KEY, "Missing " + verificationSpec.getSignatureLabel() + " in Signature-Input");
+    private StructuredInnerList getSignatureInputByLabelAndTag(StructuredDictionary inputDictionary, String requestedLabel, String requestedTag)
+            throws SignatureException {
+        var optionalSignatureInput = inputDictionary.getItem(requestedLabel, StructuredInnerList.class);
+
+        if (requestedTag != null && optionalSignatureInput.isPresent() && !isTagPresent(requestedTag, optionalSignatureInput.get())) {
+            throw new SignatureException(ErrorCode.MISSING_TAG, "Missing " + requestedTag + " tag in Signature-Input");
+        } else if (optionalSignatureInput.isEmpty()) {
+            throw new SignatureException(ErrorCode.MISSING_DICTIONARY_KEY, "Missing " + requestedLabel + " label in Signature-Input");
+        } else {
+            return optionalSignatureInput.get();
         }
+    }
 
-        return optionalSignatureInput.get();
+    private Map.Entry<String, StructuredInnerList> getSignatureInputByTag(StructuredDictionary inputDictionary, String requestedTag) throws SignatureException {
+        var inputEntries = inputDictionary.entrySet(StructuredInnerList.class).stream()
+                .filter(entry -> isTagPresent(requestedTag, entry.getValue()))
+                .limit(2)
+                .collect(Collectors.toList());
+
+        if (inputEntries.size() == 1) {
+            return inputEntries.get(0);
+        } else if (inputEntries.isEmpty()) {
+            throw new SignatureException(ErrorCode.MISSING_TAG, "Missing " + requestedTag + " tag in Signature-Input");
+        } else {
+            throw new SignatureException(ErrorCode.DUPLICATE_TAG, "Multiple " + requestedTag + " tags in Signature-Input");
+        }
+    }
+
+    private boolean isTagPresent(String requestedTag, StructuredInnerList signatureInput) {
+        return signatureInput.stringParam(SignatureParameterType.TAG.getIdentifier())
+                .filter(requestedTag::equals)
+                .isPresent();
     }
 
     private byte[] getSignature() throws SignatureException {
@@ -140,17 +179,17 @@ final class SignatureVerifier {
             throw new SignatureException(ErrorCode.INVALID_STRUCTURED_HEADER, "Unable to parse Signature header", e);
         }
 
-        var signature = dictionary.getBytes(verificationSpec.getSignatureLabel());
+        var signature = dictionary.getBytes(signatureLabel);
 
         if (signature.isEmpty()) {
-            throw new SignatureException(ErrorCode.MISSING_DICTIONARY_KEY, "Missing " + verificationSpec.getSignatureLabel() + " in Signature");
+            throw new SignatureException(ErrorCode.MISSING_DICTIONARY_KEY, "Missing " + signatureLabel + " in Signature");
         }
 
         return signature.get();
     }
 
-    private SignatureParameters getSignatureParameters() {
-        return SignatureParameters.builder()
+    private void populateSignatureParameters() {
+        signatureParameters = SignatureParameters.builder()
                 .created(signatureInput.longParam(SignatureParameterType.CREATED.getIdentifier())
                         .map(Instant::ofEpochSecond).orElse(null))
                 .expires(signatureInput.longParam(SignatureParameterType.EXPIRES.getIdentifier())

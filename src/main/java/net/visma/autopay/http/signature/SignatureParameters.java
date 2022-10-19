@@ -31,7 +31,7 @@ import java.util.UUID;
 /**
  * Builder class for constructing Signature Parameters. Used when creating signatures.
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-11.html#name-signature-parameters">Signature Parameters</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-signature-parameters">Signature Parameters</a>
  * @see SignatureParameterType
  */
 public class SignatureParameters {
@@ -234,11 +234,22 @@ public class SignatureParameters {
         /**
          * Sets <em>keyid</em> parameter
          *
-         * @param keyId Value <em>keyid</em>
+         * @param keyId Value of <em>keyid</em>
          * @return This builder
          */
         public Builder keyId(String keyId) {
             parameters.put(SignatureParameterType.KEY_ID, keyId);
+            return this;
+        }
+
+        /**
+         * Sets <em>tag</em> parameter
+         *
+         * @param tag Value of <em>tag</em>
+         * @return This builder
+         */
+        public Builder tag(String tag) {
+            parameters.put(SignatureParameterType.TAG, tag);
             return this;
         }
 

@@ -121,6 +121,8 @@ public class PublicKeyInfo {
          */
         public Builder publicKey(PublicKey publicKey) {
             this.publicKey = publicKey;
+            this.bytePublicKey = null;
+            this.stringPublicKey = null;
             return this;
         }
 
@@ -132,7 +134,9 @@ public class PublicKeyInfo {
          * @see #publicKey(String)
          */
         public Builder publicKey(byte[] publicKey) {
-            bytePublicKey = publicKey;
+            this.bytePublicKey = publicKey;
+            this.publicKey = null;
+            this.stringPublicKey = null;
             return this;
         }
 
@@ -146,7 +150,9 @@ public class PublicKeyInfo {
          * @return This builder
          */
         public Builder publicKey(String publicKey) {
-            stringPublicKey = publicKey;
+            this.stringPublicKey = publicKey;
+            this.publicKey = null;
+            this.bytePublicKey = null;
             return this;
         }
 
