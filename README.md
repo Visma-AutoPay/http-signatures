@@ -7,7 +7,7 @@ This library provides a high-level Java interface for creating and verifying
 signatures as defined in the
 [HTTP Message Signatures specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html)
 (draft 13). As by-products, it implements
-[Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html)
+[Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html)
 (draft 10) and
 [Structured Field Values for HTTP](https://www.rfc-editor.org/rfc/rfc8941).
 
@@ -41,7 +41,7 @@ This library allows to compute and verify `Content-Digest`, `Signature-Input`
 and `Signature` headers.
 
 - `Content-Digest` - A digest (hash value) of the request body, defined by
-[Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html)
+[Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html)
 - `Signature-Input` - Defines the signature: which parts of the request are 
 included, what key is used
 - `Signature` - Concatenated request parts defined in the input are signed by
@@ -456,7 +456,7 @@ See https://github.com/bcgit/bc-java/issues/751
 
 ## Digest Fields
 
-[Digest Fields specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html)
+[Digest Fields specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html)
 
 Values for `Content-Digest` header can be computed by using `DigestCalculator`
 class. Only "secure" algorithms are supported: `sha-256` and `sha-512`.
