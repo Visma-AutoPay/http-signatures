@@ -8,7 +8,7 @@ signatures as defined in the
 [HTTP Message Signatures specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html)
 (draft 13). As by-products, it implements
 [Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html)
-(draft 10) and
+(draft 13) and
 [Structured Field Values for HTTP](https://www.rfc-editor.org/rfc/rfc8941).
 
 It requires Java 11 or newer and does not have compile dependencies.
