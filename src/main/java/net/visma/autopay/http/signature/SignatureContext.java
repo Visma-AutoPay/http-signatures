@@ -92,8 +92,8 @@ public class SignatureContext {
      * Returns Signature Context for Related Request
      *
      * @return SignatureContext of Related Request
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-     *      Request-Response Signature Binding</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+     *      Signing Request Components in a Response Message</a>
      */
     SignatureContext getRelatedRequestContext() {
         return relatedRequestContext;
@@ -178,7 +178,7 @@ public class SignatureContext {
          * @param headerName  HTTP header (field) name
          * @param headerValue Header value
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-http-fields">HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
          */
         public Builder header(String headerName, Object headerValue) {
             headerName = headerName.toLowerCase();
@@ -212,7 +212,7 @@ public class SignatureContext {
          *
          * @param headers A map of HTTP header names and values
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-http-fields">HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
          */
         public Builder headers(Map<String, ?> headers) {
             for (var entry : headers.entrySet()) {

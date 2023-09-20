@@ -68,7 +68,7 @@ public final class SignatureResult {
      * Returns signature base which can be used for logging or debugging
      *
      * @return Signature Base
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-creating-the-signature-base">
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-creating-the-signature-base">
      *      Creating the Signature Base</a>
      */
     public String getSignatureBase() {

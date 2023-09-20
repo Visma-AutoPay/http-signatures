@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 /**
  * Defines types of Signature Parameters
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-signature-parameters">Signature Parameters</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signature-parameters">Signature Parameters</a>
  */
 public enum SignatureParameterType {
     /**
@@ -47,7 +47,7 @@ public enum SignatureParameterType {
     NONCE("nonce"),
 
     /**
-     * alg - the HTTP message signature algorithm from the HTTP Message Signature Algorithm Registry, as a String value
+     * alg - the HTTP message signature algorithm from the HTTP Signature Algorithm Registry, as a String value
      */
     ALGORITHM("alg"),
 

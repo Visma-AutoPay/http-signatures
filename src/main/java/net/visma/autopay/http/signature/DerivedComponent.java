@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * Class representing Derived Components
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-derived-components">Derived Components</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-derived-components">Derived Components</a>
  */
 final class DerivedComponent extends Component {
     private final DerivedComponentType componentType;

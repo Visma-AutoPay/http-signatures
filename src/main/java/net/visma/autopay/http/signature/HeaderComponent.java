@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * Both "plain" headers, canonicalized fields and dictionary field members are represented.
  * From both "this" and "related" request.
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-http-fields">HTTP Fields</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
  */
 final class HeaderComponent extends Component {
     private final String headerName;
