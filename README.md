@@ -187,6 +187,7 @@ var signatureComponents = SignatureComponents.builder()
         // Components derived from the response
         .status()
         // When signing a response, components from related request can be added
+        // (request that triggered generated response)
         .relatedRequestMethod().relatedRequestPath()
 
         // Header names can be provided one-by-one

@@ -115,7 +115,7 @@ public class SignatureComponents {
         }
 
         /**
-         * Adds a single HTTP Field (header) component for Related Request (req)
+         * Adds a single HTTP Field (header) component for Related Request (req, request that triggered generated response)
          *
          * @param headerName Header name from the related request
          * @return This builder

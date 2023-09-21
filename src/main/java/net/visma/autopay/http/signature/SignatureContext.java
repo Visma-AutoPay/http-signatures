@@ -230,7 +230,7 @@ public class SignatureContext {
         }
 
         /**
-         * Sets Signature Context of the Related Request
+         * Sets Signature Context of the Related Request (request that triggered generated response)
          *
          * @param relatedRequestContext Related Request's Signature Context
          * @return This builder
