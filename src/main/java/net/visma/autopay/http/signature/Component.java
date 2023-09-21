@@ -42,12 +42,12 @@ abstract class Component {
     protected static final String DICTIONARY_KEY_PARAM = "key";
 
     /**
-     * Structured Parameter key for Canonicalized fields
+     * Structured Parameter key for structured fields re-serialized to their standard form, without redundant whitespaces
      *
      * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-strict-serialization-of-htt">
      *      Strict Serialization of HTTP Structured Fields</a>
      */
-    protected static final String CANONICALIZED_FIELD_PARAM = "sf";
+    protected static final String STRUCTURED_FIELD_PARAM = "sf";
 
     /**
      * Structured Parameter key for components from Related Request

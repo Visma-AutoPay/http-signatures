@@ -65,7 +65,7 @@ class SignatureSpecTest {
                         .build())
                 .components(SignatureComponents.builder()
                         .header("h1")
-                        .canonicalizedHeader("ch")
+                        .structuredHeader("ch")
                         .dictionaryMember("h3", "ok")
                         .method()
                         .queryParam("par")

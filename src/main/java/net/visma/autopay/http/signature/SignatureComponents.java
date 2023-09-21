@@ -130,7 +130,7 @@ public class SignatureComponents {
         }
 
         /**
-         * Adds a single Canonicalized Structured Field (header) component
+         * Adds a single Structured Field (header) component, re-serialized to its standard form (without redundant whitespaces)
          *
          * @param headerName Header name
          * @return This builder
@@ -138,13 +138,14 @@ public class SignatureComponents {
          *      Strict Serialization of HTTP Structured Fields</a>
          * @see HeaderComponent
          */
-        public Builder canonicalizedHeader(String headerName) {
+        public Builder structuredHeader(String headerName) {
             components.add(new HeaderComponent(headerName.toLowerCase(), null, true, false, false));
             return this;
         }
 
         /**
-         * Adds a single Canonicalized Structured Field (header) component for Related Request
+         * Adds a single Structured Field (header) component for Related Request. Header value is re-serialized to its standard form
+         * (without redundant whitespaces).
          *
          * @param headerName Header name
          * @return This builder
@@ -154,7 +155,7 @@ public class SignatureComponents {
          *      Signing Request Components in a Response Message</a>
          * @see HeaderComponent
          */
-        public Builder relatedRequestCanonicalizedHeader(String headerName) {
+        public Builder relatedRequestStructuredHeader(String headerName) {
             components.add(new HeaderComponent(headerName.toLowerCase(), null, true, true, false));
             return this;
         }

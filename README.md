@@ -197,8 +197,9 @@ var signatureComponents = SignatureComponents.builder()
         // Or as a collection
         .headers(List.of("Content-Type", "Content-Digest"))
 
-        // Structured fields can be used in their canonicalized form
-        .canonicalizedHeader("My-Structured-Header")
+        // Structured fields can be re-serialized to their standard form,
+        // without redundant whitespaces
+        .structuredHeader("My-Structured-Header")
         // Individual items of structured dictionary
         .dictionaryMember("My-Dictionary", "key-1")
         // Multi-value header wrapped as structured byte sequences

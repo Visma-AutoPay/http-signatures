@@ -35,7 +35,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.regex.Pattern;
 
-import static net.visma.autopay.http.signature.ObjectMother.getVerificationSpecBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -140,11 +139,11 @@ class SignatureSignerTest {
         }
 
         @Test
-        void missingCanonicalizedHeaderIsDetected() {
+        void missingStructuredHeaderIsDetected() {
             // setup
             var signatureSpec = ObjectMother.getSignatureSpecBuilder()
                     .components(SignatureComponents.builder()
-                            .canonicalizedHeader("My-Header")
+                            .structuredHeader("My-Header")
                             .build())
                     .build();
 
@@ -239,11 +238,11 @@ class SignatureSignerTest {
     @Nested
     class MalformedItemTest {
         @Test
-        void malformedCanonicalizedHeaderIsDetected() {
+        void malformedStructuredHeaderIsDetected() {
             // setup
             var signatureSpec = ObjectMother.getSignatureSpecBuilder()
                     .components(SignatureComponents.builder()
-                            .canonicalizedHeader("My-Header")
+                            .structuredHeader("My-Header")
                             .build())
                     .context(SignatureContext.builder()
                             .header("My-Header", "'a'")

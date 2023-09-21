@@ -32,7 +32,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-import static net.visma.autopay.http.signature.ObjectMother.getVerificationSpecBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -128,13 +127,13 @@ class SignatureBaseSpecificationTest {
     }
 
     @Test
-    void canonicalizedFields() throws Exception {
+    void structuredFields() throws Exception {
         // setup
         var headerValue = "   a=1,    b=2; x=1.00;y=2,   c=(a   b   c)  ";
         var headerName = "Example-Dict";
         var signatureSpec = ObjectMother.getSignatureSpecBuilder()
                 .components(SignatureComponents.builder()
-                        .canonicalizedHeader(headerName)
+                        .structuredHeader(headerName)
                         .build())
                 .context(SignatureContext.builder()
                         .header(headerName, headerValue)
@@ -365,7 +364,7 @@ class SignatureBaseSpecificationTest {
         var signatureSpec = ObjectMother.getSignatureSpecBuilder()
                 .components(SignatureComponents.builder()
                         .relatedRequestHeader("Content-Type")
-                        .relatedRequestCanonicalizedHeader("Dict")
+                        .relatedRequestStructuredHeader("Dict")
                         .relatedRequestAuthority()
                         .relatedRequestMethod()
                         .relatedRequestPath()

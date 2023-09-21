@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 /**
  * Class representing HTTP Fields (Headers) Component
  * <p>
- * Both "plain" headers, canonicalized fields and dictionary field members are represented.
+ * Both "plain" headers, structured fields and dictionary field members are represented.
  * From both "this" and "related" request.
  *
  * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 final class HeaderComponent extends Component {
     private final String headerName;
     private final String dictionaryKey;
-    private final boolean canonicalized;
+    private final boolean structured;
     private final boolean binaryWrapped;
 
     /**
@@ -58,7 +58,7 @@ final class HeaderComponent extends Component {
         super(StructuredString.of(headerName));
         this.headerName = headerName;
         this.dictionaryKey = null;
-        this.canonicalized = false;
+        this.structured = false;
         this.binaryWrapped = false;
     }
 
@@ -67,15 +67,15 @@ final class HeaderComponent extends Component {
      *
      * @param headerName         HTTP header name
      * @param dictionaryKey      Dictionary key for Dictionary Structured Field Members
-     * @param canonicalized      True for Canonicalized Structured HTTP Fields
+     * @param structured         True for Structured HTTP Fields re-serialized to their standard form
      * @param fromRelatedRequest True if component is from related request
      * @param binaryWrapped      True if header values need to be wrapped as binary structures
      */
-    HeaderComponent(String headerName, String dictionaryKey, boolean canonicalized, boolean fromRelatedRequest, boolean binaryWrapped) {
-        super(getStructuredName(headerName, dictionaryKey, canonicalized, fromRelatedRequest, binaryWrapped));
+    HeaderComponent(String headerName, String dictionaryKey, boolean structured, boolean fromRelatedRequest, boolean binaryWrapped) {
+        super(getStructuredName(headerName, dictionaryKey, structured, fromRelatedRequest, binaryWrapped));
         this.headerName = headerName;
         this.dictionaryKey = dictionaryKey;
-        this.canonicalized = canonicalized;
+        this.structured = structured;
         this.binaryWrapped = binaryWrapped;
 
         if (dictionaryKey != null && dictionaryKey.isEmpty()) {
@@ -92,11 +92,11 @@ final class HeaderComponent extends Component {
         super(structuredHeader);
         this.headerName = structuredHeader.stringValue();
         this.dictionaryKey = structuredHeader.stringParam(DICTIONARY_KEY_PARAM).orElse(null);
-        this.canonicalized = structuredHeader.boolParam(CANONICALIZED_FIELD_PARAM).orElse(false);
+        this.structured = structuredHeader.boolParam(STRUCTURED_FIELD_PARAM).orElse(false);
         this.binaryWrapped = structuredHeader.boolParam(BINARY_WRAPPED_PARAM).orElse(false);
     }
 
-    private static StructuredString getStructuredName(String headerName, String dictionaryKey, boolean canonicalized, boolean fromRelatedRequest,
+    private static StructuredString getStructuredName(String headerName, String dictionaryKey, boolean structured, boolean fromRelatedRequest,
                                                       boolean binaryWrapped) {
         var params = new LinkedHashMap<String, Object>();
 
@@ -104,8 +104,8 @@ final class HeaderComponent extends Component {
             params.put(RELATED_REQUEST_PARAM, true);
         }
 
-        if (canonicalized && dictionaryKey == null) {
-            params.put(CANONICALIZED_FIELD_PARAM, true);
+        if (structured && dictionaryKey == null) {
+            params.put(STRUCTURED_FIELD_PARAM, true);
         }
 
         if (dictionaryKey != null) {
@@ -134,11 +134,11 @@ final class HeaderComponent extends Component {
             var headerValue = getSingleValue(headerValues);
 
             if (dictionaryKey != null) {
-                computedValue =  getDictionaryMember(headerValue);
-            } else if (canonicalized) {
-                computedValue =  getCanonicalized(headerValue);
+                computedValue = getDictionaryMember(headerValue);
+            } else if (structured) {
+                computedValue = reSerializeStructuredField(headerValue);
             } else {
-                computedValue =  headerValue;
+                computedValue = headerValue;
             }
         }
 
@@ -170,7 +170,7 @@ final class HeaderComponent extends Component {
                 .collect(Collectors.joining(", "));
     }
 
-    private String getCanonicalized(String headerValue) throws SignatureException {
+    private String reSerializeStructuredField(String headerValue) throws SignatureException {
         try {
             return StructuredField.parse(headerValue).serialize();
         } catch (StructuredException e) {
@@ -179,15 +179,15 @@ final class HeaderComponent extends Component {
     }
 
     private String getDictionaryMember(String headerValue) throws SignatureException {
-        StructuredDictionary structured;
+        StructuredDictionary dictionary;
 
         try {
-            structured = StructuredDictionary.parse(headerValue);
+            dictionary = StructuredDictionary.parse(headerValue);
         } catch (StructuredException e) {
             throw new SignatureException(ErrorCode.INVALID_STRUCTURED_HEADER, "Invalid structured dictionary " + headerName, e);
         }
 
-        var optionalKeyValue = structured.getItem(dictionaryKey);
+        var optionalKeyValue = dictionary.getItem(dictionaryKey);
 
         if (optionalKeyValue.isPresent()) {
             return optionalKeyValue.get().serialize();
