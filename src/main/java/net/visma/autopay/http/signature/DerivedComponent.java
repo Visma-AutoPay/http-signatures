@@ -25,6 +25,7 @@ import net.visma.autopay.http.structured.StructuredString;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Class representing Derived Components
@@ -69,16 +70,15 @@ final class DerivedComponent extends Component {
      * Creates Derived Component object from its {@link StructuredString} representation
      *
      * @param structuredHeader Structured String representation of the component
-     * @throws NullPointerException When param name is not given for &#64;query-param component
+     * @throws NullPointerException     When param name is not given for &#64;query-param component
+     * @throws IllegalArgumentException When illegal or unknown param is provided
      */
     DerivedComponent(StructuredString structuredHeader) {
         super(structuredHeader);
         this.componentType = Objects.requireNonNull(DerivedComponentType.fromIdentifier(structuredHeader.stringValue()));
         this.queryParamName = structuredHeader.stringParam(QUERY_PARAM_NAME_PARAM).orElse(null);
 
-        if (componentType == DerivedComponentType.QUERY_PARAM && (queryParamName == null || queryParamName.isEmpty())) {
-            throw new NullPointerException("Query param name is missing");
-        }
+        validateParams(structuredHeader);
     }
 
     private static StructuredString getStructuredName(DerivedComponentType componentType, String queryParamName, boolean fromRelatedRequest) {
@@ -93,6 +93,26 @@ final class DerivedComponent extends Component {
         }
 
         return StructuredString.withParams(componentType.getIdentifier(), params);
+    }
+
+    private void validateParams(StructuredString structuredHeader) {
+        Set<String> allowedParams;
+
+        if (componentType == DerivedComponentType.QUERY_PARAM) {
+            if (queryParamName == null || queryParamName.isEmpty()) {
+                throw new NullPointerException("Query param name is missing");
+            }
+
+            allowedParams = Set.of(QUERY_PARAM_NAME_PARAM, RELATED_REQUEST_PARAM);
+        } else {
+            allowedParams = Set.of(RELATED_REQUEST_PARAM);
+        }
+
+        for (var paramName : structuredHeader.parameters().keySet()) {
+            if (!allowedParams.contains(paramName)) {
+                throw new IllegalArgumentException("Illegal component parameter " + paramName + " for component " + structuredHeader.stringValue());
+            }
+        }
     }
 
     @Override

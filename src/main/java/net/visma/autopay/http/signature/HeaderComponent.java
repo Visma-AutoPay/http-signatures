@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +45,9 @@ import java.util.stream.Collectors;
  * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
  */
 final class HeaderComponent extends Component {
+    private static final Set<String> ALLOWED_PARAMS = Set.of(Component.DICTIONARY_KEY_PARAM, Component.STRUCTURED_FIELD_PARAM, Component.RELATED_REQUEST_PARAM,
+            Component.BINARY_WRAPPED_PARAM);
+
     private final String headerName;
     private final String dictionaryKey;
     private final boolean structured;
@@ -87,6 +91,7 @@ final class HeaderComponent extends Component {
      * Creates Header Component object from its {@link StructuredString} representation
      *
      * @param structuredHeader Structured String representation of the component
+     * @throws IllegalArgumentException When illegal or unknown param is provided
      */
     HeaderComponent(StructuredString structuredHeader) {
         super(structuredHeader);
@@ -94,6 +99,8 @@ final class HeaderComponent extends Component {
         this.dictionaryKey = structuredHeader.stringParam(DICTIONARY_KEY_PARAM).orElse(null);
         this.structured = structuredHeader.boolParam(STRUCTURED_FIELD_PARAM).orElse(false);
         this.binaryWrapped = structuredHeader.boolParam(BINARY_WRAPPED_PARAM).orElse(false);
+
+        validateParams(structuredHeader);
     }
 
     private static StructuredString getStructuredName(String headerName, String dictionaryKey, boolean structured, boolean fromRelatedRequest,
@@ -117,6 +124,14 @@ final class HeaderComponent extends Component {
         }
 
         return StructuredString.withParams(headerName, params);
+    }
+
+    private void validateParams(StructuredString structuredHeader) {
+        for (var paramName : structuredHeader.parameters().keySet()) {
+            if (!ALLOWED_PARAMS.contains(paramName)) {
+                throw new IllegalArgumentException("Illegal component parameter " + paramName + " for component " + structuredHeader.stringValue());
+            }
+        }
     }
 
     @Override

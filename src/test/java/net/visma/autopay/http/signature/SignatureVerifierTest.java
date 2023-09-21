@@ -510,8 +510,7 @@ class SignatureVerifierTest {
         }
 
         @ParameterizedTest
-        @CsvSource({"Signature, test=(), test=:@test:", "Signature-Input, test=test, test=:YQ==:", "Signature-Input, test=(test), test=:YQ==:",
-                "Signature-Input, test=(test1;req;key=\"a\" test1 test1;key=\"a\";req), test=:YQ==:"})
+        @CsvSource({"Signature, test=(), test=:@test:", "Signature-Input, test=test, test=:YQ==:", "Signature-Input, test=(test), test=:YQ==:"})
         void invalidSignatureHeaderIsDetected(String headerName, String signatureInput, String signature) {
             var verificationSpec = ObjectMother.getVerificationSpecBuilder()
                     .context(SignatureContext.builder()
@@ -543,6 +542,55 @@ class SignatureVerifierTest {
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_DICTIONARY_KEY);
             assertThat(exception).hasMessageContaining("test");
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {"my-header,par", "my-header,name=q", "@query-param,sf;name=q", "@query,key", "@query,par"})
+        void illegalComponentParameterIsDetected(String componentName, String param) {
+            // setup
+            var verificationSpec = ObjectMother.getVerificationSpecBuilder()
+                    .context(SignatureContext.builder()
+                            .header(SignatureHeaders.SIGNATURE_INPUT, "test=(\"" + componentName + "\";" + param + ");created=1234567890")
+                            .header(SignatureHeaders.SIGNATURE, "test=:YQ==:")
+                            .header("my-header", "example-value")
+                            .build())
+                    .build();
+
+            // execute
+            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+
+            // verify
+            assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_STRUCTURED_HEADER);
+            assertThat(exception).hasMessageContaining(SignatureHeaders.SIGNATURE_INPUT);
+        }
+
+        @Test
+        void unknownDerivedComponentIsDetected() {
+            // setup
+            var verificationSpec = ObjectMother.getVerificationSpecBuilder("test=(\"@hello\");created=1234567890", "test=:YQ==:")
+                    .build();
+
+            // execute
+            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+
+            // verify
+            assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_STRUCTURED_HEADER);
+            assertThat(exception).hasMessageContaining(SignatureHeaders.SIGNATURE_INPUT);
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {"\"hello\" \"hi\" \"hello\"", "\"test1\";req;key=\"a\" \"test1\" \"test1\";key=\"a\";req"})
+        void duplicateComponentIsDetected(String components) {
+            // setup
+            var verificationSpec = ObjectMother.getVerificationSpecBuilder("test=(" + components + ")", "test=:YQ==:")
+                    .build();
+
+            // execute
+            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+
+            // verify
+            assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_STRUCTURED_HEADER);
+            assertThat(exception).hasMessageContaining(SignatureHeaders.SIGNATURE_INPUT);
         }
     }
 
