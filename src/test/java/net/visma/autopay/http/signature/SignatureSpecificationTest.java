@@ -490,7 +490,7 @@ class SignatureSpecificationTest {
     }
 
     @Test
-    @DisplayName("Request-Response Signature Binding")
+    @DisplayName("Request components in response")
     void requestResponseBinding() throws Exception {
         // setup
         var requestSignatureLabel = "sig1";
