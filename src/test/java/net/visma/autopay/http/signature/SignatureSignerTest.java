@@ -135,7 +135,28 @@ class SignatureSignerTest {
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_HEADER);
-            assertThat(exception).hasMessageContaining("my-header");
+            assertThat(exception)
+                    .hasMessageContaining("my-header")
+                    .hasMessageContaining("Header");
+        }
+
+        @Test
+        void missingTrailerIsDetected() {
+            // setup
+            var signatureSpec = ObjectMother.getSignatureSpecBuilder()
+                    .components(SignatureComponents.builder()
+                            .trailer("My-Trailer")
+                            .build())
+                    .build();
+
+            // execute
+            var exception = catchThrowableOfType(signatureSpec::sign, SignatureException.class);
+
+            // verify
+            assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_HEADER);
+            assertThat(exception)
+                    .hasMessageContaining("my-trailer")
+                    .hasMessageContaining("Trailer");
         }
 
         @Test

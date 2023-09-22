@@ -125,7 +125,7 @@ public class SignatureComponents {
          * @see HeaderComponent
          */
         public Builder relatedRequestHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, true, false));
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, true, false, false));
             return this;
         }
 
@@ -139,7 +139,7 @@ public class SignatureComponents {
          * @see HeaderComponent
          */
         public Builder structuredHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, false, false));
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, false, false, false));
             return this;
         }
 
@@ -156,7 +156,7 @@ public class SignatureComponents {
          * @see HeaderComponent
          */
         public Builder relatedRequestStructuredHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, true, false));
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, true, false, false));
             return this;
         }
 
@@ -171,7 +171,7 @@ public class SignatureComponents {
          * @see HeaderComponent
          */
         public Builder dictionaryMember(String headerName, String dictionaryKey) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, false, false));
+            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, false, false, false));
             return this;
         }
 
@@ -188,7 +188,7 @@ public class SignatureComponents {
          * @see HeaderComponent
          */
         public Builder relatedRequestDictionaryMember(String headerName, String dictionaryKey) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, true, false));
+            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, true, false, false));
             return this;
         }
 
@@ -201,7 +201,7 @@ public class SignatureComponents {
          *      Binary-wrapped HTTP Fields</a>
          */
         public Builder binaryWrappedHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, false, true));
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, false, true, false));
             return this;
         }
 
@@ -216,7 +216,160 @@ public class SignatureComponents {
          *      Signing Request Components in a Response Message</a>
          */
         public Builder relatedRequestBinaryWrappedHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, true, true));
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, true, true, false));
+            return this;
+        }
+
+        /**
+         * Adds a single HTTP Field component for a trailer
+         *
+         * @param trailerName Trailer name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see HeaderComponent
+         */
+        public Builder trailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, false, false, false, true));
+            return this;
+        }
+
+        /**
+         * Adds multiple HTTP Field components for trailers
+         *
+         * @param trailerNames Trailer names
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see HeaderComponent
+         */
+        public Builder trailers(Collection<String> trailerNames) {
+            trailerNames.forEach(this::trailer);
+            return this;
+        }
+
+        /**
+         * Adds multiple HTTP Field components for trailers
+         *
+         * @param trailerNames Trailer names
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see HeaderComponent
+         */
+        public Builder trailers(String... trailerNames) {
+            for (var trailerName : trailerNames) {
+                trailer(trailerName);
+            }
+            return this;
+        }
+
+        /**
+         * Adds a single HTTP Field component for a trailed from Related Request (req, request that triggered generated response)
+         *
+         * @param trailerName Trailer name from the related request
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
+         * @see HeaderComponent
+         */
+        public Builder relatedRequestTrailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, false, true, false, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Structured Field component for a trailer, re-serialized to its standard form (without redundant whitespaces)
+         *
+         * @param trailerName Trailer name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-strict-serialization-of-htt">
+         *      Strict Serialization of HTTP Structured Fields</a>
+         * @see HeaderComponent
+         */
+        public Builder structuredTrailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, true, false, false, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Structured Field component for a trailer from Related Request. Trailer value is re-serialized to its standard form
+         * (without redundant whitespaces).
+         *
+         * @param trailerName Trailer name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-strict-serialization-of-htt">
+         *      Strict Serialization of HTTP Structured Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
+         * @see HeaderComponent
+         */
+        public Builder relatedRequestStructuredTrailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, true, true, false, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Dictionary Structured Field Member component for a trailer
+         *
+         * @param trailerName   Trailer name
+         * @param dictionaryKey Dictionary member key
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-dictionary-structured-field">
+         *      Dictionary Structured Field Members</a>
+         * @see HeaderComponent
+         */
+        public Builder trailerDictionaryMember(String trailerName, String dictionaryKey) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, false, false, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Dictionary Structured Field Member component for a trailer from Related Request
+         *
+         * @param trailerName   Trailer name
+         * @param dictionaryKey Dictionary member key
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-dictionary-structured-field">
+         *      Dictionary Structured Field Members</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
+         * @see HeaderComponent
+         */
+        public Builder relatedRequestTrailerDictionaryMember(String trailerName, String dictionaryKey) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, true, false, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Binary-wrapped HTTP Field component for a trailer
+         *
+         * @param trailerName Trailer name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-binary-wrapped-http-fields">
+         *      Binary-wrapped HTTP Fields</a>
+         */
+        public Builder binaryWrappedTrailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, false, false, true, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Binary-wrapped HTTP Field component for a trailer from Related request
+         *
+         * @param trailerName Trailer name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-binary-wrapped-http-fields">
+         *      Binary-wrapped HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
+         */
+        public Builder relatedRequestBinaryWrappedTrailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, false, true, true, true));
             return this;
         }
 

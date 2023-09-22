@@ -45,13 +45,14 @@ import java.util.stream.Collectors;
  * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
  */
 final class HeaderComponent extends Component {
-    private static final Set<String> ALLOWED_PARAMS = Set.of(Component.DICTIONARY_KEY_PARAM, Component.STRUCTURED_FIELD_PARAM, Component.RELATED_REQUEST_PARAM,
-            Component.BINARY_WRAPPED_PARAM);
+    private static final Set<String> ALLOWED_PARAMS = Set.of(DICTIONARY_KEY_PARAM, STRUCTURED_FIELD_PARAM, RELATED_REQUEST_PARAM, BINARY_WRAPPED_PARAM,
+            TRAILER_PARAM);
 
     private final String headerName;
     private final String dictionaryKey;
     private final boolean structured;
     private final boolean binaryWrapped;
+    private final boolean trailer;
 
     /**
      * Creates a Header Component of given header name
@@ -64,6 +65,7 @@ final class HeaderComponent extends Component {
         this.dictionaryKey = null;
         this.structured = false;
         this.binaryWrapped = false;
+        this.trailer = false;
     }
 
     /**
@@ -74,13 +76,15 @@ final class HeaderComponent extends Component {
      * @param structured         True for Structured HTTP Fields re-serialized to their standard form
      * @param fromRelatedRequest True if component is from related request
      * @param binaryWrapped      True if header values need to be wrapped as binary structures
+     * @param trailer            True if component is HTTP trailer rather than header
      */
-    HeaderComponent(String headerName, String dictionaryKey, boolean structured, boolean fromRelatedRequest, boolean binaryWrapped) {
-        super(getStructuredName(headerName, dictionaryKey, structured, fromRelatedRequest, binaryWrapped));
+    HeaderComponent(String headerName, String dictionaryKey, boolean structured, boolean fromRelatedRequest, boolean binaryWrapped, boolean trailer) {
+        super(getStructuredName(headerName, dictionaryKey, structured, fromRelatedRequest, binaryWrapped, trailer));
         this.headerName = headerName;
         this.dictionaryKey = dictionaryKey;
         this.structured = structured;
         this.binaryWrapped = binaryWrapped;
+        this.trailer = trailer;
 
         if (dictionaryKey != null && dictionaryKey.isEmpty()) {
             throw new IllegalArgumentException("Invalid dictionary key: " + dictionaryKey);
@@ -99,12 +103,13 @@ final class HeaderComponent extends Component {
         this.dictionaryKey = structuredHeader.stringParam(DICTIONARY_KEY_PARAM).orElse(null);
         this.structured = structuredHeader.boolParam(STRUCTURED_FIELD_PARAM).orElse(false);
         this.binaryWrapped = structuredHeader.boolParam(BINARY_WRAPPED_PARAM).orElse(false);
+        this.trailer = structuredHeader.boolParam(TRAILER_PARAM).orElse(false);
 
         validateParams(structuredHeader);
     }
 
     private static StructuredString getStructuredName(String headerName, String dictionaryKey, boolean structured, boolean fromRelatedRequest,
-                                                      boolean binaryWrapped) {
+                                                      boolean binaryWrapped, boolean trailer) {
         var params = new LinkedHashMap<String, Object>();
 
         if (fromRelatedRequest) {
@@ -123,6 +128,10 @@ final class HeaderComponent extends Component {
             params.put(BINARY_WRAPPED_PARAM, true);
         }
 
+        if (trailer) {
+            params.put(TRAILER_PARAM, true);
+        }
+
         return StructuredString.withParams(headerName, params);
     }
 
@@ -136,11 +145,12 @@ final class HeaderComponent extends Component {
 
     @Override
     String computeValue(SignatureContext signatureContext) throws SignatureException {
-        var headerValues = signatureContext.getHeaders().get(headerName);
+        var headerValues = getFieldValue(signatureContext);
         String computedValue;
 
         if (headerValues == null) {
-            throw new SignatureException(ErrorCode.MISSING_HEADER, "Header " + headerName + " is missing");
+            var fieldType = trailer ? "Trailer " : "Header ";
+            throw new SignatureException(ErrorCode.MISSING_HEADER, fieldType + headerName + " is missing");
         }
 
         if (binaryWrapped) {
@@ -162,7 +172,7 @@ final class HeaderComponent extends Component {
 
     @Override
     boolean isValueInContext(SignatureContext signatureContext) {
-        var headerValue = signatureContext.getHeaders().get(headerName);
+        var headerValue = getFieldValue(signatureContext);
 
         if (headerValue == null) {
             return false;
@@ -223,6 +233,10 @@ final class HeaderComponent extends Component {
         }
 
         return headerValue;
+    }
+
+    private List<String> getFieldValue(SignatureContext signatureContext) {
+        return trailer ?  signatureContext.getTrailers().get(headerName) : signatureContext.getHeaders().get(headerName);
     }
 
     @Override

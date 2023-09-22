@@ -42,13 +42,16 @@ public class SignatureContext {
     private final String method;
     private final URI targetUri;
     private final Map<String, List<String>> headers;
+    private final Map<String, List<String>> trailers;
     private final SignatureContext relatedRequestContext;
 
-    private SignatureContext(Integer status, String method, URI targetUri, Map<String, List<String>> headers, SignatureContext relatedRequestContext) {
+    private SignatureContext(Integer status, String method, URI targetUri, Map<String, List<String>> headers, Map<String, List<String>> trailers,
+                             SignatureContext relatedRequestContext) {
         this.status = status;
         this.method = method;
         this.targetUri = targetUri;
         this.headers = headers;
+        this.trailers = trailers;
         this.relatedRequestContext = relatedRequestContext;
     }
 
@@ -82,10 +85,19 @@ public class SignatureContext {
     /**
      * Returns a map of HTTP headers. Map keys are header names, lowercase. Map values are header values.
      *
-     * @return Map of http headers
+     * @return Map of HTTP headers
      */
     Map<String, List<String>> getHeaders() {
         return headers;
+    }
+
+    /**
+     * Returns a map of HTTP trailers. Map keys are trailer names, lowercase. Map values are trailer values.
+     *
+     * @return Map of HTTP trailers
+     */
+    Map<String, List<String>> getTrailers() {
+        return trailers;
     }
 
     /**
@@ -116,10 +128,12 @@ public class SignatureContext {
         private String method;
         private URI targetUri;
         private final Map<String, List<String>> headers;
+        private final Map<String, List<String>> trailers;
         private SignatureContext relatedRequestContext;
 
         private Builder() {
             headers = new HashMap<>();
+            trailers = new HashMap<>();
         }
 
         /**
@@ -181,21 +195,7 @@ public class SignatureContext {
          * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
          */
         public Builder header(String headerName, Object headerValue) {
-            headerName = headerName.toLowerCase();
-            var sanitizedValue = sanitizeHeaderValue(headerValue);
-            var existingValue = headers.get(headerName);
-
-            if (existingValue != null) {
-                // Optimization, together with List.of() below. In most cases, we'll have single-element lists.
-                if (existingValue.size() == 1) {
-                    existingValue = new ArrayList<>(existingValue);
-                    headers.put(headerName, existingValue);
-                }
-
-                existingValue.add(sanitizedValue);
-            } else {
-                headers.put(headerName, List.of(sanitizedValue));
-            }
+            populateHeaderOrTrailer(headers, headerName, headerValue);
 
             return this;
         }
@@ -215,16 +215,45 @@ public class SignatureContext {
          * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
          */
         public Builder headers(Map<String, ?> headers) {
-            for (var entry : headers.entrySet()) {
-                var headerName = entry.getKey();
-                var headerValue = entry.getValue();
+            populateHeadersOrTrailers(this.headers, headers);
 
-                if (headerValue instanceof Iterable<?>) {
-                    ((Iterable<?>) headerValue).forEach(val -> header(headerName, val));
-                } else {
-                    header(headerName, headerValue);
-                }
-            }
+            return this;
+        }
+
+        /**
+         * Adds an HTTP trailer of given name and value
+         * <p>
+         * Internally, the name is converted to lowercase, and the value is converted to its toString() representation.
+         * When called multiple times with the same trailerName, trailer values are concatenated by using a single space and a single comma,
+         * with stripped leading and trailing whitespaces.
+         *
+         * @param trailerName  HTTP trailer (field) name
+         * @param trailerValue Trailer value
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         */
+        public Builder trailer(String trailerName, Object trailerValue) {
+            populateHeaderOrTrailer(trailers, trailerName, trailerValue);
+
+            return this;
+        }
+
+        /**
+         * Adds HTTP trailers from given map
+         * <p>
+         * Map keys are trailer names. Map values are trailer values.
+         * Internally, names is converted to lowercase, and values are converted to their toString() representation.
+         * <p>
+         * If the value is an instance of {@link Iterable}, like List or Set, it's treated as multiple values of the trailer.
+         * This way, <em>multimap</em> trailer holders, like {@code javax.ws.rs.core.MultivaluedMap}, can be used directly.
+         * Multiple trailer values are concatenated by using a single space and a single comma, with stripped leading and trailing whitespaces.
+         *
+         * @param trailers A map of HTTP trailer names and values
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         */
+        public Builder trailers(Map<String, ?> trailers) {
+            populateHeadersOrTrailers(this.trailers, trailers);
 
             return this;
         }
@@ -246,7 +275,38 @@ public class SignatureContext {
          * @return SignatureContext object
          */
         public SignatureContext build() {
-            return new SignatureContext(status, method, targetUri, headers, relatedRequestContext);
+            return new SignatureContext(status, method, targetUri, headers, trailers, relatedRequestContext);
+        }
+
+        private void populateHeadersOrTrailers(Map<String, List<String>> container, Map<String, ?> fields) {
+            for (var entry : fields.entrySet()) {
+                var headerName = entry.getKey();
+                var headerValue = entry.getValue();
+
+                if (headerValue instanceof Iterable<?>) {
+                    ((Iterable<?>) headerValue).forEach(val -> populateHeaderOrTrailer(container, headerName, val));
+                } else {
+                    populateHeaderOrTrailer(container, headerName, headerValue);
+                }
+            }
+        }
+
+        private void populateHeaderOrTrailer(Map<String, List<String>> container, String headerName, Object headerValue) {
+            headerName = headerName.toLowerCase();
+            var sanitizedValue = sanitizeHeaderValue(headerValue);
+            var existingValue = container.get(headerName);
+
+            if (existingValue != null) {
+                // Optimization, together with List.of() below. In most cases, we'll have single-element lists.
+                if (existingValue.size() == 1) {
+                    existingValue = new ArrayList<>(existingValue);
+                    container.put(headerName, existingValue);
+                }
+
+                existingValue.add(sanitizedValue);
+            } else {
+                container.put(headerName, List.of(sanitizedValue));
+            }
         }
 
         private String sanitizeHeaderValue(Object headerValue) {
