@@ -23,6 +23,9 @@ package net.visma.autopay.http.signature;
 
 import net.visma.autopay.http.structured.StructuredString;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Set;
@@ -59,11 +62,16 @@ final class DerivedComponent extends Component {
     DerivedComponent(DerivedComponentType componentType, String queryParamName, boolean fromRelatedRequest) {
         super(getStructuredName(componentType, queryParamName, fromRelatedRequest));
         this.componentType = componentType;
-        this.queryParamName = queryParamName;
 
         if (componentType == DerivedComponentType.QUERY_PARAM && (queryParamName == null || queryParamName.isEmpty())) {
             throw new NullPointerException("Query param name is missing");
         }
+
+        if (componentType == DerivedComponentType.QUERY_PARAM) {
+            queryParamName = encodeQueryPart(queryParamName);
+        }
+
+        this.queryParamName = queryParamName;
     }
 
     /**
@@ -89,7 +97,7 @@ final class DerivedComponent extends Component {
         }
 
         if (componentType == DerivedComponentType.QUERY_PARAM && queryParamName != null) {
-            params.put(QUERY_PARAM_NAME_PARAM, queryParamName);
+            params.put(QUERY_PARAM_NAME_PARAM, encodeQueryPart(queryParamName));
         }
 
         return StructuredString.withParams(componentType.getIdentifier(), params);
@@ -122,7 +130,7 @@ final class DerivedComponent extends Component {
         try {
             switch (componentType) {
                 case QUERY_PARAM:
-                    return getQueryParamValue(targetUri.getQuery());
+                    return getQueryParamValue(targetUri.getRawQuery());
                 case METHOD:
                     return Objects.requireNonNull(signatureContext.getMethod());
                 case TARGET_URI:
@@ -132,11 +140,11 @@ final class DerivedComponent extends Component {
                 case SCHEME:
                     return Objects.requireNonNull(targetUri.getScheme());
                 case REQUEST_TARGET:
-                    return formatPath(targetUri.getPath()) + (targetUri.getQuery() != null ? formatQuery(targetUri.getQuery()) : "");
+                    return formatPath(targetUri.getRawPath()) + (targetUri.getRawQuery() != null ? formatQuery(targetUri.getRawQuery()) : "");
                 case PATH:
-                    return formatPath(targetUri.getPath());
+                    return formatPath(targetUri.getRawPath());
                 case QUERY:
-                    return '?' + Objects.toString(targetUri.getQuery(), "");
+                    return '?' + Objects.toString(targetUri.getRawQuery(), "");
                 case STATUS:
                     return Integer.toString(signatureContext.getStatus());
                 case SIGNATURE_PARAMS:
@@ -157,7 +165,7 @@ final class DerivedComponent extends Component {
 
         switch (componentType) {
             case QUERY_PARAM:
-                return uriPresent && isQueryInContext(targetUri.getQuery()) && isQueryParamInContext(targetUri.getQuery());
+                return uriPresent && isQueryInContext(targetUri.getRawQuery()) && isQueryParamInContext(targetUri.getRawQuery());
             case METHOD:
                 return signatureContext.getMethod() != null;
             case TARGET_URI:
@@ -168,9 +176,9 @@ final class DerivedComponent extends Component {
             case SCHEME:
                 return uriPresent && targetUri.getScheme() != null;
             case PATH:
-                return uriPresent && isPathInContext(targetUri.getPath());
+                return uriPresent && isPathInContext(targetUri.getRawPath());
             case QUERY:
-                return uriPresent && isQueryInContext(targetUri.getQuery());
+                return uriPresent && isQueryInContext(targetUri.getRawQuery());
             case STATUS:
                 return signatureContext.getStatus() != null;
             case SIGNATURE_PARAMS:
@@ -213,12 +221,21 @@ final class DerivedComponent extends Component {
             var idx = pair.indexOf("=");
             var key = idx > 0 ? pair.substring(0, idx) : pair;
 
-            if (queryParamName.equals(key)) {
-                return (idx > 0 && pair.length() > idx + 1) ? pair.substring(idx + 1) : "";
+            if (queryParamName.equals(reEncodeQueryPart(key))) {
+                var rawValue = (idx > 0 && pair.length() > idx + 1) ? pair.substring(idx + 1) : "";
+                return reEncodeQueryPart(rawValue);
             }
         }
 
         throw new SignatureException(SignatureException.ErrorCode.MISSING_QUERY_PARAM, "Query param " + queryParamName + " is missing");
+    }
+
+    private static String reEncodeQueryPart(String rawQueryPart) {
+        return encodeQueryPart(URLDecoder.decode(rawQueryPart, StandardCharsets.UTF_8));
+    }
+
+    private static String encodeQueryPart(String decodedQueryPart) {
+        return URLEncoder.encode(decodedQueryPart, StandardCharsets.UTF_8).replace("+", "%20");
     }
 
     @Override

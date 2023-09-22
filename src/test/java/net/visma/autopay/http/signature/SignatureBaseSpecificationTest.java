@@ -26,6 +26,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.security.Security;
 import java.time.Instant;
@@ -274,6 +276,137 @@ class SignatureBaseSpecificationTest {
         assertThat(result.getSignature()).isEqualTo(expectedSignature);
 
         // signature verification
+        assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/a%21b", "/a%C3%B3b", "/a!b"})
+    void pathBeforeDecodingIsUsed(String path) throws Exception {
+        // setup
+        var url = "https://example.com" + path;
+        var signatureSpec = ObjectMother.getSignatureSpecBuilder()
+                .components(SignatureComponents.builder()
+                        .targetUri()
+                        .requestTarget()
+                        .path()
+                        .build())
+                .parameters(SignatureParameters.builder().algorithm(SignatureAlgorithm.ED_25519).build())
+                .context(SignatureContext.builder()
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+        var expectedSignatureBase = "\"@target-uri\": https://example.com" + path + "\n" +
+                "\"@request-target\": " + path + "\n" +
+                "\"@path\": " + path + "\n" +
+                "\"@signature-params\": (\"@target-uri\" \"@request-target\" \"@path\")";
+        var expectedSignatureInput = "test=(\"@target-uri\" \"@request-target\" \"@path\")";
+
+        // execute
+        var result = signatureSpec.sign();
+
+        // verify signature base and input
+        assertThat(result.getSignatureBase()).isEqualTo(expectedSignatureBase);
+        assertThat(result.getSignatureInput()).isEqualTo(expectedSignatureInput);
+
+        // verify signature
+        var verificationSpec = ObjectMother.getVerificationSpecBuilder()
+                .context(SignatureContext.builder()
+                        .header(SignatureHeaders.SIGNATURE_INPUT, expectedSignatureInput)
+                        .header(SignatureHeaders.SIGNATURE, result.getSignature())
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+
+        assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
+    }
+
+    @Test
+    void queryBeforeDecodingIsUsed() throws Exception {
+        // setup
+        var query = "?one=a%21b&two=a%C3%B3b&t:ree=a!b";
+        var url = "https://example.com" + query;
+        var signatureSpec = ObjectMother.getSignatureSpecBuilder()
+                .components(SignatureComponents.builder()
+                        .query()
+                        .targetUri()
+                        .requestTarget()
+                        .build())
+                .parameters(SignatureParameters.builder().algorithm(SignatureAlgorithm.ED_25519).build())
+                .context(SignatureContext.builder()
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+        var expectedSignatureBase = "\"@query\": " + query + "\n" +
+                "\"@target-uri\": " + url + "\n" +
+                "\"@request-target\": /" + query + "\n" +
+                "\"@signature-params\": (\"@query\" \"@target-uri\" \"@request-target\")";
+        var expectedSignatureInput = "test=(\"@query\" \"@target-uri\" \"@request-target\")";
+        var expectedSignature = "test=:kjOWEWKlZpq9eNaO0CUiuYcOlouxxQNPgxR5DS5RF0QXfbhKMHhdXy6mXGRlETRjCOntPcpg5Yc10DVUPhVvDw==:";
+
+        // execute
+        var result = signatureSpec.sign();
+
+        // verify signature base and input
+        assertThat(result.getSignatureBase()).isEqualTo(expectedSignatureBase);
+        assertThat(result.getSignatureInput()).isEqualTo(expectedSignatureInput);
+
+        // verify signature
+        var verificationSpec = ObjectMother.getVerificationSpecBuilder()
+                .context(SignatureContext.builder()
+                        .header(SignatureHeaders.SIGNATURE_INPUT, expectedSignatureInput)
+                        .header(SignatureHeaders.SIGNATURE, expectedSignature)
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+
+        assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
+    }
+
+    @Test
+    void decodedQueryParamsAreUsed() throws Exception {
+        // setup
+        var decodedParamName = "q$p r+s t";
+        var paramName = "q%24p+r%2Bs%20t";
+        var reEncodedParamName = "q%24p%20r%2Bs%20t";
+        var paramValue = "a+b%21c%2Cd%20e%2Df-g%48h%2Bi";
+        var reEncodedValue = "a%20b%21c%2Cd%20e-f-gHh%2Bi";
+        var url = "https://example.com?" + paramName + "=" + paramValue;
+        var signatureSpec = ObjectMother.getSignatureSpecBuilder()
+                .components(SignatureComponents.builder()
+                        .queryParam(decodedParamName)
+                        .build())
+                .parameters(SignatureParameters.builder().algorithm(SignatureAlgorithm.ED_25519).build())
+                .context(SignatureContext.builder()
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+        var expectedSignatureBase = "\"@query-param\";name=\"" + reEncodedParamName + "\": " + reEncodedValue + "\n" +
+                "\"@signature-params\": (\"@query-param\";name=\"" + reEncodedParamName + "\")";
+        var expectedSignatureInput = "test=(\"@query-param\";name=\"" + reEncodedParamName + "\")";
+        var expectedSignature = "test=:re8gjxFsm11CiIcczGWI87eARrPVUnu8ajauA/GiJ5be9YO3hj5JC736AEHiqwZ/Rrm4zwl5QhsyPVKbH3yBDQ==:";
+
+        // execute
+        var result = signatureSpec.sign();
+
+        // verify signature base and input
+        assertThat(result.getSignatureBase()).isEqualTo(expectedSignatureBase);
+        assertThat(result.getSignatureInput()).isEqualTo(expectedSignatureInput);
+
+        // verify signature
+        var verificationSpec = ObjectMother.getVerificationSpecBuilder()
+                .context(SignatureContext.builder()
+                        .header(SignatureHeaders.SIGNATURE_INPUT, expectedSignatureInput)
+                        .header(SignatureHeaders.SIGNATURE, expectedSignature)
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+
         assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
     }
 
