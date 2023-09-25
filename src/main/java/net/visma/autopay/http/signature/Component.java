@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,47 +30,55 @@ import java.util.Objects;
  * <p>
  * Backed by {@link StructuredString}. Contains component definition - value should be provided in {@link SignatureContext}
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-http-message-components">HTTP Message Components</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-message-components">HTTP Message Components</a>
  */
 abstract class Component {
     /**
      * Structured Parameter key for Structured Dictionary members
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-dictionary-structured-field">
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-dictionary-structured-field">
      *      Dictionary Structured Field Members</a>
      */
     protected static final String DICTIONARY_KEY_PARAM = "key";
 
     /**
-     * Structured Parameter key for Canonicalized fields
+     * Structured Parameter key for structured fields re-serialized to their standard form, without redundant whitespaces
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-canonicalized-structured-ht">
-     *      Canonicalized Structured HTTP Fields</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-strict-serialization-of-htt">
+     *      Strict Serialization of HTTP Structured Fields</a>
      */
-    protected static final String CANONICALIZED_FIELD_PARAM = "sf";
+    protected static final String STRUCTURED_FIELD_PARAM = "sf";
 
     /**
      * Structured Parameter key for components from Related Request
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-     *      Request-Response Signature Binding</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+     *      Signing Request Components in a Response Message</a>
      */
     protected static final String RELATED_REQUEST_PARAM = "req";
 
     /**
      * Structured Parameter key for Query Param name
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-query-parameters">Query Parameters</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-query-parameters">Query Parameters</a>
      */
     protected static final String QUERY_PARAM_NAME_PARAM = "name";
 
     /**
-     * Structures Parameter key for Binary-wrapped Fields
+     * Structured Parameter key for Binary-wrapped Fields
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-binary-wrapped-http-fields">
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-binary-wrapped-http-fields">
      *      Binary-wrapped HTTP Fields</a>
      */
     protected static final String BINARY_WRAPPED_PARAM = "bs";
+
+    /**
+     * Structured Parameter key for Trailer Fields
+     *
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">
+     *     Trailer Fields</a>
+     */
+    protected static final String TRAILER_PARAM = "tr";
 
     private final StructuredString name;
 

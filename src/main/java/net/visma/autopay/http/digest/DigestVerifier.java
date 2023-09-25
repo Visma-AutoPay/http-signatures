@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ import java.util.Arrays;
 /**
  * Verifies values of <em>Content-Digest</em> and <em>Repr-Digest</em> headers
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html">Digest Fields</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html">Digest Fields</a>
  */
 public final class DigestVerifier {
     /**

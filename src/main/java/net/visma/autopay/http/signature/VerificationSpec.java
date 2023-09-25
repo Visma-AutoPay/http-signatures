@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +79,7 @@ public class VerificationSpec {
      *
      * @throws SignatureException Incorrect signature or problems with verification, e.g. missing or malformatted values in Signature Context, problems with the
      *                            public key. For detailed reason call {@link SignatureException#getErrorCode()}.
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-verifying-a-signature">Verifying a Signature</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-verifying-a-signature">Verifying a Signature</a>
      */
     public void verify() throws SignatureException {
         SignatureVerifier.verify(this);

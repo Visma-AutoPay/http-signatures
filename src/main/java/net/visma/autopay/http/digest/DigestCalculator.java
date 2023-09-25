@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Calculates values for <em>Content-Digest</em> and <em>Repr-Digest</em> headers
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html">Digest Fields</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html">Digest Fields</a>
  */
 public final class DigestCalculator {
     /**
@@ -47,7 +47,7 @@ public final class DigestCalculator {
      *                  and <em>Content-Encoding</em>.
      * @param algorithm Hash algorithm
      * @return Digest filed to be directly copied to the header
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html#name-the-content-digest-field">The Content-Digest Field</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html#name-the-content-digest-field">The Content-Digest Field</a>
      */
     public static String calculateDigestHeader(byte[] content, DigestAlgorithm algorithm) {
         return StructuredDictionary.of(algorithm.getHttpKey(), calculateDigest(content, algorithm)).serialize();
@@ -63,7 +63,7 @@ public final class DigestCalculator {
      * @param wantDigestHeader Value of <em>Want-Content-Digest</em> or <em>Want-Repr-Digest</em> header
      * @return Digest filed to be directly copied to the header
      * @throws DigestException Invalid <em>Want-...</em> header or unsupported wanted algorithm(s).
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html#name-integrity-preference-fields">Integrity preference fields</a>
+     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html#name-integrity-preference-fields">Integrity preference fields</a>
      */
     public static String calculateDigestHeader(byte[] content, String wantDigestHeader) throws DigestException {
         try {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -314,12 +314,12 @@ class StructuredParserTest {
                 .satisfies(map -> assertThat(map.getBytes("sha-512").get()).hasSize(64));
 
         var signatureInputDict = StructuredDictionary.parse("reqres=(\"@status\" \"content-length\" \"content-type\" "
-                + " \"@request-response\";key=\"sig1\");created=1618884479;keyid=\"test-key-ecc-p256\"");
+                + " example;key=\"sig1\");created=1618884479;keyid=\"test-key-ecc-p256\"");
         assertThat(signatureInputDict.itemMap()).hasSize(1);
         var signatureInput = signatureInputDict.getItem("reqres", StructuredInnerList.class).get();
         assertThat(signatureInput.longParam("created")).contains(1618884479L);
         assertThat(signatureInput.stringParam("keyid")).contains("test-key-ecc-p256");
-        assertThat(signatureInput.stringList()).containsExactly("@status", "content-length", "content-type", "@request-response");
+        assertThat(signatureInput.stringList()).containsExactly("@status", "content-length", "content-type", "example");
         assertThat(signatureInput.itemList().get(3).stringParam("key")).contains("sig1");
     }
 

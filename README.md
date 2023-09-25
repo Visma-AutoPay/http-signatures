@@ -5,10 +5,10 @@ authenticity for components of an HTTP message.
 
 This library provides a high-level Java interface for creating and verifying
 signatures as defined in the
-[HTTP Message Signatures specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html)
-(draft 13). As by-products, it implements
-[Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html)
-(draft 10) and
+[HTTP Message Signatures specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html)
+(draft 19). As by-products, it implements
+[Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html)
+(draft 13) and
 [Structured Field Values for HTTP](https://www.rfc-editor.org/rfc/rfc8941).
 
 It requires Java 11 or newer and does not have compile dependencies.
@@ -20,7 +20,7 @@ Maven dependency is
 <dependency>
     <groupId>net.visma.autopay</groupId>
     <artifactId>http-signatures</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
@@ -41,12 +41,12 @@ This library allows to compute and verify `Content-Digest`, `Signature-Input`
 and `Signature` headers.
 
 - `Content-Digest` - A digest (hash value) of the request body, defined by
-[Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html)
+[Digest Fields](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html)
 - `Signature-Input` - Defines the signature: which parts of the request are 
 included, what key is used
 - `Signature` - Concatenated request parts defined in the input are signed by
 using the referenced key. Both Signature-Input and Signature are defined by
-[HTTP Message Signatures](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html).
+[HTTP Message Signatures](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html).
 - Syntax - Those headers are formatted by using the syntax of
 [Structured Field Values for HTTP](https://www.rfc-editor.org/rfc/rfc8941)
 
@@ -187,6 +187,7 @@ var signatureComponents = SignatureComponents.builder()
         // Components derived from the response
         .status()
         // When signing a response, components from related request can be added
+        // (request that triggered generated response)
         .relatedRequestMethod().relatedRequestPath()
 
         // Header names can be provided one-by-one
@@ -197,8 +198,9 @@ var signatureComponents = SignatureComponents.builder()
         // Or as a collection
         .headers(List.of("Content-Type", "Content-Digest"))
 
-        // Structured fields can be used in their canonicalized form
-        .canonicalizedHeader("My-Structured-Header")
+        // Structured fields can be re-serialized to their standard form,
+        // without redundant whitespaces
+        .structuredHeader("My-Structured-Header")
         // Individual items of structured dictionary
         .dictionaryMember("My-Dictionary", "key-1")
         // Multi-value header wrapped as structured byte sequences
@@ -432,7 +434,7 @@ Support for Edwards-Curve signatures (`SignatureAlgorithm.ED_25519`, `Ed25519`)
 was added to JRE in Java 15. For older JREs, a third-party provider must be
 used.
 
-As [ECDSA signatures require IEEE P1363 format (raw)](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-ecdsa-using-curve-p-256-dss),
+As [ECDSA signatures require IEEE P1363 format (raw)](https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-ecdsa-using-curve-p-256-dss),
 algorithm `SHA256withECDSAinP1363Format` is used rather than `SHA256withECDSA`
 (and `SHA384withECDSAinP1363Format` rather than `SHA384withECDSA`).
 If your provider uses a different name, like Bouncy Castle's
@@ -456,7 +458,7 @@ See https://github.com/bcgit/bc-java/issues/751
 
 ## Digest Fields
 
-[Digest Fields specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html)
+[Digest Fields specification](https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html)
 
 Values for `Content-Digest` header can be computed by using `DigestCalculator`
 class. Only "secure" algorithms are supported: `sha-256` and `sha-512`.

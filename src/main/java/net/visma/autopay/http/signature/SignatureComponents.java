@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ import java.util.Objects;
  * Contains component definitions - values should be provided in {@link SignatureContext}.
  * Internally, backed by a list of {@link Component} objects.
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-http-message-components">HTTP Message Components</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-message-components">HTTP Message Components</a>
  * @see Component
  */
 public class SignatureComponents {
@@ -78,7 +78,7 @@ public class SignatureComponents {
          *
          * @param headerName Header name
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-http-fields">HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
          * @see HeaderComponent
          */
         public Builder header(String headerName) {
@@ -91,7 +91,7 @@ public class SignatureComponents {
          *
          * @param headerNames Header names
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-http-fields">HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
          * @see HeaderComponent
          */
         public Builder headers(Collection<String> headerNames) {
@@ -104,7 +104,7 @@ public class SignatureComponents {
          *
          * @param headerNames Header names
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-http-fields">HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
          * @see HeaderComponent
          */
         public Builder headers(String... headerNames) {
@@ -115,47 +115,48 @@ public class SignatureComponents {
         }
 
         /**
-         * Adds a single HTTP Field (header) component for Related Request (req)
+         * Adds a single HTTP Field (header) component for Related Request (req, request that triggered generated response)
          *
          * @param headerName Header name from the related request
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-http-fields">HTTP Fields</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>*
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          * @see HeaderComponent
          */
         public Builder relatedRequestHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, true, false));
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, true, false, false));
             return this;
         }
 
         /**
-         * Adds a single Canonicalized Structured Field (header) component
+         * Adds a single Structured Field (header) component, re-serialized to its standard form (without redundant whitespaces)
          *
          * @param headerName Header name
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-canonicalized-structured-ht">
-         *      Canonicalized Structured HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-strict-serialization-of-htt">
+         *      Strict Serialization of HTTP Structured Fields</a>
          * @see HeaderComponent
          */
-        public Builder canonicalizedHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, false, false));
+        public Builder structuredHeader(String headerName) {
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, false, false, false));
             return this;
         }
 
         /**
-         * Adds a single Canonicalized Structured Field (header) component for Related Request
+         * Adds a single Structured Field (header) component for Related Request. Header value is re-serialized to its standard form
+         * (without redundant whitespaces).
          *
          * @param headerName Header name
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-canonicalized-structured-ht">
-         *      Canonicalized Structured HTTP Fields</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-strict-serialization-of-htt">
+         *      Strict Serialization of HTTP Structured Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          * @see HeaderComponent
          */
-        public Builder relatedRequestCanonicalizedHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, true, false));
+        public Builder relatedRequestStructuredHeader(String headerName) {
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, true, true, false, false));
             return this;
         }
 
@@ -165,12 +166,12 @@ public class SignatureComponents {
          * @param headerName    Header name
          * @param dictionaryKey Dictionary member key
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-dictionary-structured-field">
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-dictionary-structured-field">
          *      Dictionary Structured Field Members</a>
          * @see HeaderComponent
          */
         public Builder dictionaryMember(String headerName, String dictionaryKey) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, false, false));
+            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, false, false, false));
             return this;
         }
 
@@ -180,14 +181,14 @@ public class SignatureComponents {
          * @param headerName    Header name
          * @param dictionaryKey Dictionary member key
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-dictionary-structured-field">
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-dictionary-structured-field">
          *      Dictionary Structured Field Members</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          * @see HeaderComponent
          */
         public Builder relatedRequestDictionaryMember(String headerName, String dictionaryKey) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, true, false));
+            components.add(new HeaderComponent(headerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, true, false, false));
             return this;
         }
 
@@ -196,11 +197,11 @@ public class SignatureComponents {
          *
          * @param headerName Header name
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-binary-wrapped-http-fields">
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-binary-wrapped-http-fields">
          *      Binary-wrapped HTTP Fields</a>
          */
         public Builder binaryWrappedHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, false, true));
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, false, true, false));
             return this;
         }
 
@@ -209,13 +210,166 @@ public class SignatureComponents {
          *
          * @param headerName Header name
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-binary-wrapped-http-fields">
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-binary-wrapped-http-fields">
          *      Binary-wrapped HTTP Fields</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          */
         public Builder relatedRequestBinaryWrappedHeader(String headerName) {
-            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, true, true));
+            components.add(new HeaderComponent(headerName.toLowerCase(), null, false, true, true, false));
+            return this;
+        }
+
+        /**
+         * Adds a single HTTP Field component for a trailer
+         *
+         * @param trailerName Trailer name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see HeaderComponent
+         */
+        public Builder trailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, false, false, false, true));
+            return this;
+        }
+
+        /**
+         * Adds multiple HTTP Field components for trailers
+         *
+         * @param trailerNames Trailer names
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see HeaderComponent
+         */
+        public Builder trailers(Collection<String> trailerNames) {
+            trailerNames.forEach(this::trailer);
+            return this;
+        }
+
+        /**
+         * Adds multiple HTTP Field components for trailers
+         *
+         * @param trailerNames Trailer names
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see HeaderComponent
+         */
+        public Builder trailers(String... trailerNames) {
+            for (var trailerName : trailerNames) {
+                trailer(trailerName);
+            }
+            return this;
+        }
+
+        /**
+         * Adds a single HTTP Field component for a trailed from Related Request (req, request that triggered generated response)
+         *
+         * @param trailerName Trailer name from the related request
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
+         * @see HeaderComponent
+         */
+        public Builder relatedRequestTrailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, false, true, false, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Structured Field component for a trailer, re-serialized to its standard form (without redundant whitespaces)
+         *
+         * @param trailerName Trailer name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-strict-serialization-of-htt">
+         *      Strict Serialization of HTTP Structured Fields</a>
+         * @see HeaderComponent
+         */
+        public Builder structuredTrailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, true, false, false, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Structured Field component for a trailer from Related Request. Trailer value is re-serialized to its standard form
+         * (without redundant whitespaces).
+         *
+         * @param trailerName Trailer name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-strict-serialization-of-htt">
+         *      Strict Serialization of HTTP Structured Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
+         * @see HeaderComponent
+         */
+        public Builder relatedRequestStructuredTrailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, true, true, false, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Dictionary Structured Field Member component for a trailer
+         *
+         * @param trailerName   Trailer name
+         * @param dictionaryKey Dictionary member key
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-dictionary-structured-field">
+         *      Dictionary Structured Field Members</a>
+         * @see HeaderComponent
+         */
+        public Builder trailerDictionaryMember(String trailerName, String dictionaryKey) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, false, false, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Dictionary Structured Field Member component for a trailer from Related Request
+         *
+         * @param trailerName   Trailer name
+         * @param dictionaryKey Dictionary member key
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-dictionary-structured-field">
+         *      Dictionary Structured Field Members</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
+         * @see HeaderComponent
+         */
+        public Builder relatedRequestTrailerDictionaryMember(String trailerName, String dictionaryKey) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), Objects.requireNonNull(dictionaryKey), false, true, false, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Binary-wrapped HTTP Field component for a trailer
+         *
+         * @param trailerName Trailer name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-binary-wrapped-http-fields">
+         *      Binary-wrapped HTTP Fields</a>
+         */
+        public Builder binaryWrappedTrailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, false, false, true, true));
+            return this;
+        }
+
+        /**
+         * Adds a single Binary-wrapped HTTP Field component for a trailer from Related request
+         *
+         * @param trailerName Trailer name
+         * @return This builder
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-binary-wrapped-http-fields">
+         *      Binary-wrapped HTTP Fields</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
+         */
+        public Builder relatedRequestBinaryWrappedTrailer(String trailerName) {
+            components.add(new HeaderComponent(trailerName.toLowerCase(), null, false, true, true, true));
             return this;
         }
 
@@ -233,7 +387,7 @@ public class SignatureComponents {
          * Adds a &#64;method derived component - the method used for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-method">Method</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-method">Method</a>
          * @see DerivedComponent
          */
         public Builder method() {
@@ -244,9 +398,9 @@ public class SignatureComponents {
          * Adds a &#64;method derived component for Related Request - the method used for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-method">Method</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-method">Method</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          * @see DerivedComponent
          */
         public Builder relatedRequestMethod() {
@@ -257,7 +411,7 @@ public class SignatureComponents {
          * Adds a &#64;target-uri derived component - the full target URI for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-target-uri">Target URI</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-target-uri">Target URI</a>
          * @see DerivedComponent
          */
         public Builder targetUri() {
@@ -268,9 +422,9 @@ public class SignatureComponents {
          * Adds a &#64;target-uri derived component for Related Request - the full target URI for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-target-uri">Target URI</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-target-uri">Target URI</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          * @see DerivedComponent
          */
         public Builder relatedRequestTargetUri() {
@@ -281,7 +435,7 @@ public class SignatureComponents {
          * Adds an &#64;authority derived component - the authority (host) of the target URI for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-authority">Authority</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-authority">Authority</a>
          * @see DerivedComponent
          */
         public Builder authority() {
@@ -292,9 +446,9 @@ public class SignatureComponents {
          * Adds an &#64;authority derived component for Related Request - the authority (host) of the target URI for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-authority">Authority</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-authority">Authority</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          * @see DerivedComponent
          */
         public Builder relatedRequestAuthority() {
@@ -305,7 +459,7 @@ public class SignatureComponents {
          * Adds a &#64;scheme derived component - the scheme of the target URI for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-scheme">Scheme</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-scheme">Scheme</a>
          * @see DerivedComponent
          */
         public Builder scheme() {
@@ -316,9 +470,9 @@ public class SignatureComponents {
          * Adds a &#64;scheme derived component for Related Request - the scheme of the target URI for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-scheme">Scheme</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-scheme">Scheme</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          * @see DerivedComponent
          */
         public Builder relatedRequestScheme() {
@@ -329,7 +483,7 @@ public class SignatureComponents {
          * Adds a &#64;request-target derived component
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-target">Request Target</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-target">Request Target</a>
          * @see DerivedComponent
          */
         public Builder requestTarget() {
@@ -340,9 +494,9 @@ public class SignatureComponents {
          * Adds a &#64;request-target derived component for Related Request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-target">Request Target</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-target">Request Target</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          * @see DerivedComponent
          */
         public Builder relatedRequestRequestTarget() {
@@ -353,7 +507,7 @@ public class SignatureComponents {
          * Adds a &#64;path derived component - the absolute path portion of the target URI for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-path">Path</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-path">Path</a>
          * @see DerivedComponent
          */
         public Builder path() {
@@ -364,9 +518,9 @@ public class SignatureComponents {
          * Adds a &#64;path derived component for Related Request - the absolute path portion of the target URI for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-path">Path</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-path">Path</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          * @see DerivedComponent
          */
         public Builder relatedRequestPath() {
@@ -377,7 +531,7 @@ public class SignatureComponents {
          * Adds a &#64;query derived component - the query portion of the target URI for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-query">Query</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-query">Query</a>
          * @see DerivedComponent
          */
         public Builder query() {
@@ -388,9 +542,9 @@ public class SignatureComponents {
          * Adds a &#64;query derived component for Related Request - the query portion of the target URI for a request
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-query">Query</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-query">Query</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          * @see DerivedComponent
          */
         public Builder relatedRequestQuery() {
@@ -400,9 +554,9 @@ public class SignatureComponents {
         /**
          * Adds a &#64;query-param derived component - a parsed query parameter of the target URI for a request
          *
-         * @param paramName Query parameter name
+         * @param paramName Query parameter name. Must be provided in decoded form, e.g. "q$p s" rather than "q%24p+r".
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-query-param">Query Parameters</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-query-param">Query Parameters</a>
          * @see DerivedComponent
          */
         public Builder queryParam(String paramName) {
@@ -413,11 +567,11 @@ public class SignatureComponents {
         /**
          * Adds a &#64;query-param derived component for Related Request - a parsed query parameter of the target URI for a request
          *
-         * @param paramName Query parameter name
+         * @param paramName Query parameter name. Must be provided in decoded form, e.g. "q$p s" rather than "q%24p+r".
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-request-query-param">Query Parameters</a>
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#name-request-response-signature-">
-         *      Request-Response Signature Binding</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-query-param">Query Parameters</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+         *      Signing Request Components in a Response Message</a>
          * @see DerivedComponent
          */
         public Builder relatedRequestQueryParam(String paramName) {
@@ -429,7 +583,7 @@ public class SignatureComponents {
          * Adds a &#64;status derived component - the status code for a response
          *
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-13.html#content-status-code">Status Code</a>
+         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-status-code">Status Code</a>
          * @see DerivedComponent
          */
         public Builder status() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,13 +26,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.security.Security;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-import static net.visma.autopay.http.signature.ObjectMother.getVerificationSpecBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -128,13 +129,13 @@ class SignatureBaseSpecificationTest {
     }
 
     @Test
-    void canonicalizedFields() throws Exception {
+    void structuredFields() throws Exception {
         // setup
         var headerValue = "   a=1,    b=2; x=1.00;y=2,   c=(a   b   c)  ";
         var headerName = "Example-Dict";
         var signatureSpec = ObjectMother.getSignatureSpecBuilder()
                 .components(SignatureComponents.builder()
-                        .canonicalizedHeader(headerName)
+                        .structuredHeader(headerName)
                         .build())
                 .context(SignatureContext.builder()
                         .header(headerName, headerValue)
@@ -278,6 +279,137 @@ class SignatureBaseSpecificationTest {
         assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"/a%21b", "/a%C3%B3b", "/a!b"})
+    void pathBeforeDecodingIsUsed(String path) throws Exception {
+        // setup
+        var url = "https://example.com" + path;
+        var signatureSpec = ObjectMother.getSignatureSpecBuilder()
+                .components(SignatureComponents.builder()
+                        .targetUri()
+                        .requestTarget()
+                        .path()
+                        .build())
+                .parameters(SignatureParameters.builder().algorithm(SignatureAlgorithm.ED_25519).build())
+                .context(SignatureContext.builder()
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+        var expectedSignatureBase = "\"@target-uri\": https://example.com" + path + "\n" +
+                "\"@request-target\": " + path + "\n" +
+                "\"@path\": " + path + "\n" +
+                "\"@signature-params\": (\"@target-uri\" \"@request-target\" \"@path\")";
+        var expectedSignatureInput = "test=(\"@target-uri\" \"@request-target\" \"@path\")";
+
+        // execute
+        var result = signatureSpec.sign();
+
+        // verify signature base and input
+        assertThat(result.getSignatureBase()).isEqualTo(expectedSignatureBase);
+        assertThat(result.getSignatureInput()).isEqualTo(expectedSignatureInput);
+
+        // verify signature
+        var verificationSpec = ObjectMother.getVerificationSpecBuilder()
+                .context(SignatureContext.builder()
+                        .header(SignatureHeaders.SIGNATURE_INPUT, expectedSignatureInput)
+                        .header(SignatureHeaders.SIGNATURE, result.getSignature())
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+
+        assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
+    }
+
+    @Test
+    void queryBeforeDecodingIsUsed() throws Exception {
+        // setup
+        var query = "?one=a%21b&two=a%C3%B3b&t:ree=a!b";
+        var url = "https://example.com" + query;
+        var signatureSpec = ObjectMother.getSignatureSpecBuilder()
+                .components(SignatureComponents.builder()
+                        .query()
+                        .targetUri()
+                        .requestTarget()
+                        .build())
+                .parameters(SignatureParameters.builder().algorithm(SignatureAlgorithm.ED_25519).build())
+                .context(SignatureContext.builder()
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+        var expectedSignatureBase = "\"@query\": " + query + "\n" +
+                "\"@target-uri\": " + url + "\n" +
+                "\"@request-target\": /" + query + "\n" +
+                "\"@signature-params\": (\"@query\" \"@target-uri\" \"@request-target\")";
+        var expectedSignatureInput = "test=(\"@query\" \"@target-uri\" \"@request-target\")";
+        var expectedSignature = "test=:kjOWEWKlZpq9eNaO0CUiuYcOlouxxQNPgxR5DS5RF0QXfbhKMHhdXy6mXGRlETRjCOntPcpg5Yc10DVUPhVvDw==:";
+
+        // execute
+        var result = signatureSpec.sign();
+
+        // verify signature base and input
+        assertThat(result.getSignatureBase()).isEqualTo(expectedSignatureBase);
+        assertThat(result.getSignatureInput()).isEqualTo(expectedSignatureInput);
+
+        // verify signature
+        var verificationSpec = ObjectMother.getVerificationSpecBuilder()
+                .context(SignatureContext.builder()
+                        .header(SignatureHeaders.SIGNATURE_INPUT, expectedSignatureInput)
+                        .header(SignatureHeaders.SIGNATURE, expectedSignature)
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+
+        assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
+    }
+
+    @Test
+    void decodedQueryParamsAreUsed() throws Exception {
+        // setup
+        var decodedParamName = "q$p r+s t";
+        var paramName = "q%24p+r%2Bs%20t";
+        var reEncodedParamName = "q%24p%20r%2Bs%20t";
+        var paramValue = "a+b%21c%2Cd%20e%2Df-g%48h%2Bi";
+        var reEncodedValue = "a%20b%21c%2Cd%20e-f-gHh%2Bi";
+        var url = "https://example.com?" + paramName + "=" + paramValue;
+        var signatureSpec = ObjectMother.getSignatureSpecBuilder()
+                .components(SignatureComponents.builder()
+                        .queryParam(decodedParamName)
+                        .build())
+                .parameters(SignatureParameters.builder().algorithm(SignatureAlgorithm.ED_25519).build())
+                .context(SignatureContext.builder()
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+        var expectedSignatureBase = "\"@query-param\";name=\"" + reEncodedParamName + "\": " + reEncodedValue + "\n" +
+                "\"@signature-params\": (\"@query-param\";name=\"" + reEncodedParamName + "\")";
+        var expectedSignatureInput = "test=(\"@query-param\";name=\"" + reEncodedParamName + "\")";
+        var expectedSignature = "test=:re8gjxFsm11CiIcczGWI87eARrPVUnu8ajauA/GiJ5be9YO3hj5JC736AEHiqwZ/Rrm4zwl5QhsyPVKbH3yBDQ==:";
+
+        // execute
+        var result = signatureSpec.sign();
+
+        // verify signature base and input
+        assertThat(result.getSignatureBase()).isEqualTo(expectedSignatureBase);
+        assertThat(result.getSignatureInput()).isEqualTo(expectedSignatureInput);
+
+        // verify signature
+        var verificationSpec = ObjectMother.getVerificationSpecBuilder()
+                .context(SignatureContext.builder()
+                        .header(SignatureHeaders.SIGNATURE_INPUT, expectedSignatureInput)
+                        .header(SignatureHeaders.SIGNATURE, expectedSignature)
+                        .targetUri(url)
+                        .method("POST")
+                        .build())
+                .build();
+
+        assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
+    }
+
     @Test
     void absentQueryStringAndPath() throws Exception {
         // setup
@@ -365,7 +497,7 @@ class SignatureBaseSpecificationTest {
         var signatureSpec = ObjectMother.getSignatureSpecBuilder()
                 .components(SignatureComponents.builder()
                         .relatedRequestHeader("Content-Type")
-                        .relatedRequestCanonicalizedHeader("Dict")
+                        .relatedRequestStructuredHeader("Dict")
                         .relatedRequestAuthority()
                         .relatedRequestMethod()
                         .relatedRequestPath()
@@ -558,5 +690,95 @@ class SignatureBaseSpecificationTest {
 
         // signature verification
         assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
+    }
+
+    @Test
+    void trailers() throws Exception {
+        // setup
+        var url = "https://example.com";
+        var relatedRequestContext = SignatureContext.builder()
+                .trailer("Related-Trailer", "source")
+                .trailer("Related-Structured-Trailer", "a=b,  c=(1   3)")
+                .trailer("Related-Dictionary", "map=(a  b c), oth=4")
+                .trailer("Related-Binary-Wrapped", "last")
+                .build();
+        var signatureSpec = ObjectMother.getSignatureSpecBuilder()
+                .components(SignatureComponents.builder()
+                        .trailer("Single-Trailer")
+                        .trailers(List.of("Collection-Trailer-1", "Collection-Trailer-2"))
+                        .trailers("Multi-Trailer-1", "Multi-Trailer-2")
+                        .relatedRequestTrailer("Related-Trailer")
+                        .structuredTrailer("Structured-Trailer")
+                        .relatedRequestStructuredTrailer("Related-Structured-Trailer")
+                        .trailerDictionaryMember("Dictionary-Member", "two")
+                        .relatedRequestTrailerDictionaryMember("Related-Dictionary", "map")
+                        .binaryWrappedTrailer("Binary-Wrapped")
+                        .relatedRequestBinaryWrappedTrailer("Related-Binary-Wrapped")
+                        .build())
+                .parameters(SignatureParameters.builder().algorithm(SignatureAlgorithm.ED_25519).build())
+                .context(SignatureContext.builder()
+                        .targetUri(url)
+                        .trailer("Single-Trailer", "sing")
+                        .trailer("Collection-Trailer-1", "col1")
+                        .trailer("Collection-Trailer-1", "col1a")
+                        .trailer("Collection-Trailer-2", "col2")
+                        .trailer("Multi-Trailer-1", "MT 1")
+                        .trailer("Multi-Trailer-2", "Multi 2")
+                        .trailers(Map.of("Structured-Trailer", "str1,  str2, (a  b c)"))
+                        .trailers(Map.of("Dictionary-Member", List.of("one=1", "two=dos")))
+                        .trailers(Map.of("Binary-Wrapped", List.of("first", "second")))
+                        .relatedRequest(relatedRequestContext)
+                        .build())
+                .build();
+
+        var expectedSignatureBase = "\"single-trailer\";tr: sing\n" +
+                "\"collection-trailer-1\";tr: col1, col1a\n" +
+                "\"collection-trailer-2\";tr: col2\n" +
+                "\"multi-trailer-1\";tr: MT 1\n" +
+                "\"multi-trailer-2\";tr: Multi 2\n" +
+                "\"related-trailer\";req;tr: source\n" +
+                "\"structured-trailer\";sf;tr: str1, str2, (a b c)\n" +
+                "\"related-structured-trailer\";req;sf;tr: a=b, c=(1 3)\n" +
+                "\"dictionary-member\";key=\"two\";tr: dos\n" +
+                "\"related-dictionary\";req;key=\"map\";tr: (a b c)\n" +
+                "\"binary-wrapped\";bs;tr: :Zmlyc3Q=:, :c2Vjb25k:\n" +
+                "\"related-binary-wrapped\";req;bs;tr: :bGFzdA==:\n" +
+                "\"@signature-params\": (\"single-trailer\";tr \"collection-trailer-1\";tr \"collection-trailer-2\";tr \"multi-trailer-1\";tr " +
+                "\"multi-trailer-2\";tr \"related-trailer\";req;tr \"structured-trailer\";sf;tr \"related-structured-trailer\";req;sf;tr " +
+                "\"dictionary-member\";key=\"two\";tr \"related-dictionary\";req;key=\"map\";tr \"binary-wrapped\";bs;tr \"related-binary-wrapped\";req;bs;tr)";
+        var expectedSignatureInput = "test=(\"single-trailer\";tr \"collection-trailer-1\";tr \"collection-trailer-2\";tr \"multi-trailer-1\";tr " +
+                "\"multi-trailer-2\";tr \"related-trailer\";req;tr \"structured-trailer\";sf;tr \"related-structured-trailer\";req;sf;tr " +
+                "\"dictionary-member\";key=\"two\";tr \"related-dictionary\";req;key=\"map\";tr \"binary-wrapped\";bs;tr \"related-binary-wrapped\";req;bs;tr)";
+        var expectedSignature = "test=:64Kkxx+JueI8qNrBXC9/4Sv8vpe88TqGD7A/C7uJXunDTyUmYp6qlFeVCKNDxbiINq/oMJUR6v802NQfZZTPBw==:";
+
+        var verificationSpec = ObjectMother.getVerificationSpecBuilder()
+                .context(SignatureContext.builder()
+                        .header(SignatureHeaders.SIGNATURE_INPUT, expectedSignatureInput)
+                        .header(SignatureHeaders.SIGNATURE, expectedSignature)
+                        .targetUri(url)
+                        .trailer("Single-Trailer", "sing")
+                        .trailer("Collection-Trailer-1", "col1")
+                        .trailer("Collection-Trailer-1", "col1a")
+                        .trailer("Collection-Trailer-2", "col2")
+                        .trailer("Multi-Trailer-1", "MT 1")
+                        .trailer("Multi-Trailer-2", "Multi 2")
+                        .trailers(Map.of("Structured-Trailer", "str1,  str2, (a  b c)"))
+                        .trailers(Map.of("Dictionary-Member", List.of("one=1", "two=dos")))
+                        .trailers(Map.of("Binary-Wrapped", List.of("first", "second")))
+                        .relatedRequest(relatedRequestContext)
+                        .build())
+                .build();
+
+        // execute
+        var result = signatureSpec.sign();
+
+        // verify signature
+        assertThat(result.getSignatureBase()).isEqualTo(expectedSignatureBase);
+        assertThat(result.getSignatureInput()).isEqualTo(expectedSignatureInput);
+        assertThat(result.getSignature()).isEqualTo(expectedSignature);
+
+        // signature verification
+        assertThatCode(verificationSpec::verify).doesNotThrowAnyException();
+
     }
 }

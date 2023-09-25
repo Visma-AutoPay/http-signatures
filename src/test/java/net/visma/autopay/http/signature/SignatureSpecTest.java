@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +65,7 @@ class SignatureSpecTest {
                         .build())
                 .components(SignatureComponents.builder()
                         .header("h1")
-                        .canonicalizedHeader("ch")
+                        .structuredHeader("ch")
                         .dictionaryMember("h3", "ok")
                         .method()
                         .queryParam("par")

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.regex.Pattern;
 
-import static net.visma.autopay.http.signature.ObjectMother.getVerificationSpecBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -136,15 +135,36 @@ class SignatureSignerTest {
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_HEADER);
-            assertThat(exception).hasMessageContaining("my-header");
+            assertThat(exception)
+                    .hasMessageContaining("my-header")
+                    .hasMessageContaining("Header");
         }
 
         @Test
-        void missingCanonicalizedHeaderIsDetected() {
+        void missingTrailerIsDetected() {
             // setup
             var signatureSpec = ObjectMother.getSignatureSpecBuilder()
                     .components(SignatureComponents.builder()
-                            .canonicalizedHeader("My-Header")
+                            .trailer("My-Trailer")
+                            .build())
+                    .build();
+
+            // execute
+            var exception = catchThrowableOfType(signatureSpec::sign, SignatureException.class);
+
+            // verify
+            assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_HEADER);
+            assertThat(exception)
+                    .hasMessageContaining("my-trailer")
+                    .hasMessageContaining("Trailer");
+        }
+
+        @Test
+        void missingStructuredHeaderIsDetected() {
+            // setup
+            var signatureSpec = ObjectMother.getSignatureSpecBuilder()
+                    .components(SignatureComponents.builder()
+                            .structuredHeader("My-Header")
                             .build())
                     .build();
 
@@ -239,11 +259,11 @@ class SignatureSignerTest {
     @Nested
     class MalformedItemTest {
         @Test
-        void malformedCanonicalizedHeaderIsDetected() {
+        void malformedStructuredHeaderIsDetected() {
             // setup
             var signatureSpec = ObjectMother.getSignatureSpecBuilder()
                     .components(SignatureComponents.builder()
-                            .canonicalizedHeader("My-Header")
+                            .structuredHeader("My-Header")
                             .build())
                     .context(SignatureContext.builder()
                             .header("My-Header", "'a'")

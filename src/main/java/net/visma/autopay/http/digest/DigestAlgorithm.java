@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,9 @@ package net.visma.autopay.http.digest;
 import java.util.Optional;
 
 /**
- * Hash algorithms. Algorithms with status <em>insecure</em> are not handled.
+ * Hash algorithms. Algorithms with status <em>Deprecated</em> are not handled.
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html#name-hash-algorithms-for-http-di">
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html#name-establish-the-hash-algorith">
  *      Hash Algorithms for HTTP Digest Fields Registry</a>
  */
 public enum DigestAlgorithm {

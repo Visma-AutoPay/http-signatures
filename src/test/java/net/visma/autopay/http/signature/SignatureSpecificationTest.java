@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -490,7 +490,7 @@ class SignatureSpecificationTest {
     }
 
     @Test
-    @DisplayName("Request-Response Signature Binding")
+    @DisplayName("Request components in response")
     void requestResponseBinding() throws Exception {
         // setup
         var requestSignatureLabel = "sig1";

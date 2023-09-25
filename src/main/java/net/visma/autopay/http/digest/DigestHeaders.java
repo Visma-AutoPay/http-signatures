@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Visma Autopay AS
+ * Copyright (c) 2022-2023 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ package net.visma.autopay.http.digest;
 /**
  * Constants with header names defined for Digest Fields
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-10.html#name-http-field-name-registratio">HTTP Field Name Registration</a>
+ * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html#name-http-field-name-registratio">HTTP Field Name Registration</a>
  */
 public final class DigestHeaders {
     /**
