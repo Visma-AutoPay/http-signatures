@@ -554,7 +554,7 @@ public class SignatureComponents {
         /**
          * Adds a &#64;query-param derived component - a parsed query parameter of the target URI for a request
          *
-         * @param paramName Query parameter name. Must be provided in decoded form, e.g. "q$p s" instead of "q%24p+r".
+         * @param paramName Query parameter name. Must be provided in decoded form, e.g. "q$p s" rather than "q%24p+r".
          * @return This builder
          * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-query-param">Query Parameters</a>
          * @see DerivedComponent
@@ -567,7 +567,7 @@ public class SignatureComponents {
         /**
          * Adds a &#64;query-param derived component for Related Request - a parsed query parameter of the target URI for a request
          *
-         * @param paramName Query parameter name. Must be provided in decoded form, e.g. "q$p s" instead of "q%24p+r".
+         * @param paramName Query parameter name. Must be provided in decoded form, e.g. "q$p s" rather than "q%24p+r".
          * @return This builder
          * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#content-request-query-param">Query Parameters</a>
          * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
