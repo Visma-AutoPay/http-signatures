@@ -66,7 +66,8 @@ class SignatureContextTest {
                 .build();
 
         // verify
-        assertThat(signatureContext.getHeaders()).containsOnly(entry("header1", List.of("header1Value1", "header1Value2")), entry("header2", List.of("header2Value")));
+        assertThat(signatureContext.getHeaders()).containsOnly(
+                entry("header1", List.of("header1Value1", "header1Value2")), entry("header2", List.of("header2Value")));
         assertThat(signatureContext.getTargetUri()).isNotNull();
         assertThat(signatureContext.getTargetUri()).hasToString("http://localhost?country=NO");
     }
@@ -83,8 +84,8 @@ class SignatureContextTest {
                 .build();
 
         // verify
-        assertThat(signatureContext.getHeaders()).containsOnly(entry("header1", List.of("header1Value1", "header1Value2")), entry("header2", List.of("header2Value")));
-
+        assertThat(signatureContext.getHeaders()).containsOnly(
+                entry("header1", List.of("header1Value1", "header1Value2")), entry("header2", List.of("header2Value")));
     }
 
     private static class HttpServletRequestStub {
