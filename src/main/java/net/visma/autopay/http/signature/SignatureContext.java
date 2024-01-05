@@ -23,10 +23,13 @@ package net.visma.autopay.http.signature;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -162,6 +165,8 @@ public class SignatureContext {
 
         /**
          * Sets target URI
+         * <p>
+         * {@code targetUri} is not the same as servlet's {@code requestUri}
          *
          * @param targetUri Target URI given as {@link URI} object
          * @return This builder
@@ -173,12 +178,36 @@ public class SignatureContext {
 
         /**
          * Sets target URI
+         * <p>
+         * {@code targetUri} is not the same as servlet's {@code requestUri}.
          *
          * @param targetUri Target URI given as {@link String}
          * @return This builder
          */
         public Builder targetUri(String targetUri) {
             this.targetUri = URI.create(targetUri);
+            return this;
+        }
+
+        /**
+         * Sets target URI
+         * <p>
+         * Method offers compatibility with {@code HttpServletRequest} methods.
+         * {@code targetUri} is not the same as servlet's {@code requestUri}.
+         *
+         * @param requestUrl  request URL
+         * @param queryString query string
+         * @return This builder
+         */
+        public Builder targetUri(StringBuffer requestUrl, String queryString) {
+            var targetUriTmp = requestUrl.toString();
+
+            if (queryString != null) {
+                targetUriTmp += "?" + queryString;
+            }
+
+            this.targetUri = URI.create(targetUriTmp);
+
             return this;
         }
 
@@ -216,6 +245,48 @@ public class SignatureContext {
          */
         public Builder headers(Map<String, ?> headers) {
             populateHeadersOrTrailers(this.headers, headers);
+
+            return this;
+        }
+
+        /**
+         * Adds HTTP headers.
+         * <p>
+         * Method offers compatibility with {@code HttpServletRequest} methods.
+         *
+         * @param headerNames   enumeration of HTTP servlet request header names
+         * @param headersGetter getter of HTTP servlet request headers enumeration
+         * @return This builder
+         */
+        public Builder headers(Enumeration<String> headerNames, Function<String, Enumeration<String>> headersGetter) {
+            while (headerNames.hasMoreElements()) {
+                var headerName = headerNames.nextElement();
+                var headerValues = headersGetter.apply(headerName);
+
+                while (headerValues.hasMoreElements()) {
+                    populateHeaderOrTrailer(headers, headerName, headerValues.nextElement());
+                }
+            }
+            return this;
+        }
+
+        /**
+         * Adds HTTP headers.
+         * <p>
+         * Method offers compatibility with {@code HttpServletResponse} methods.
+         *
+         * @param headerNames   collection of HTTP servlet response header names
+         * @param headersGetter getter of HTTP servlet response headers collection
+         * @return This builder
+         */
+        public Builder headers(Collection<String> headerNames, Function<String, Collection<String>> headersGetter) {
+            for (String headerName : headerNames) {
+                var headerValues = headersGetter.apply(headerName);
+
+                for (String headerValue : headerValues) {
+                    populateHeaderOrTrailer(headers, headerName, headerValue);
+                }
+            }
 
             return this;
         }

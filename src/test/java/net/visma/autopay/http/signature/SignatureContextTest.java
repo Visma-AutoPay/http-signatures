@@ -23,7 +23,12 @@ package net.visma.autopay.http.signature;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,5 +50,96 @@ class SignatureContextTest {
 
         // verify
         assertThat(signatureContext.getHeaders()).containsOnly(entry("header-1", List.of("one", "two")), entry("header-2", List.of("", "xx", "yy")));
+    }
+
+    @Test
+    void signatureContextCreatedFromHttpServletRequest() {
+        // setup
+        HttpServletRequestStub request = new HttpServletRequestStub(new StringBuffer("http://localhost"), "country=NO");
+        request.addHttpHeaders("header1", List.of("header1Value1", "header1Value2"));
+        request.addHttpHeaders("header2", List.of("header2Value"));
+
+        // execute
+        var signatureContext = SignatureContext.builder()
+                .headers(request.getHeaderNames(), request::getHeaders)
+                .targetUri(request.getRequestUrl(), request.getQueryString())
+                .build();
+
+        // verify
+        assertThat(signatureContext.getHeaders()).containsOnly(entry("header1", List.of("header1Value1", "header1Value2")), entry("header2", List.of("header2Value")));
+        assertThat(signatureContext.getTargetUri()).isNotNull();
+        assertThat(signatureContext.getTargetUri()).hasToString("http://localhost?country=NO");
+    }
+
+    @Test
+    void signatureContextCreatedFromHttpServletResponse() {
+        HttpServletResponseStub response = new HttpServletResponseStub();
+        response.addHttpHeaders("header1", List.of("header1Value1", "header1Value2"));
+        response.addHttpHeaders("header2", List.of("header2Value"));
+
+        // execute
+        var signatureContext = SignatureContext.builder()
+                .headers(response.getHeaderNames(), response::getHeaders)
+                .build();
+
+        // verify
+        assertThat(signatureContext.getHeaders()).containsOnly(entry("header1", List.of("header1Value1", "header1Value2")), entry("header2", List.of("header2Value")));
+
+    }
+
+    private static class HttpServletRequestStub {
+
+        private final StringBuffer requestUrl;
+        private final String queryString;
+        private final Map<String, List<String>> httpHeaders = new HashMap<>();
+        private final List<String> headerNames = new ArrayList<>();
+
+        public HttpServletRequestStub(StringBuffer requestUrl, String queryString) {
+            this.requestUrl = requestUrl;
+            this.queryString = queryString;
+        }
+
+        public void addHttpHeaders(String headerName, List<String> headerValues) {
+            this.headerNames.add(headerName);
+            this.httpHeaders.put(headerName, headerValues);
+        }
+
+        public Enumeration<String> getHeaderNames() {
+            return Collections.enumeration(this.headerNames);
+        }
+
+        public Enumeration<String> getHeaders(String name) {
+            return Collections.enumeration(this.httpHeaders.get(name));
+        }
+
+        public StringBuffer getRequestUrl() {
+            return this.requestUrl;
+        }
+
+        public String getQueryString() {
+            return this.queryString;
+        }
+    }
+
+    private static class HttpServletResponseStub {
+
+        private final Map<String, List<String>> httpHeaders = new HashMap<>();
+        private final List<String> headerNames = new ArrayList<>();
+
+        public HttpServletResponseStub() {
+        }
+
+        public Collection<String> getHeaderNames() {
+            return this.headerNames;
+        }
+
+        public Collection<String> getHeaders(String name) {
+            return this.httpHeaders.get(name);
+        }
+
+        public void addHttpHeaders(String headerName, List<String> headerValues) {
+            this.headerNames.add(headerName);
+            this.httpHeaders.put(headerName, headerValues);
+        }
     }
 }
