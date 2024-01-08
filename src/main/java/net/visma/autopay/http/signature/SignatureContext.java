@@ -194,11 +194,21 @@ public class SignatureContext {
          * <p>
          * Method offers compatibility with {@code HttpServletRequest} methods.
          * {@code targetUri} is not the same as servlet's {@code requestUri}.
+         * <p>
+         * Example:
+         * <pre>
+         * SignatureContext.builder()
+         *     ...
+         *     .targetUri(request.getRequestURL(), request.getQueryString())
+         *     ...
+         *     .build();
+         * </pre>
          *
          * @param requestUrl  request URL
          * @param queryString query string
          * @return This builder
          */
+        @SuppressWarnings("java:S1149")
         public Builder targetUri(StringBuffer requestUrl, String queryString) {
             var targetUriTmp = requestUrl.toString();
 
@@ -253,6 +263,15 @@ public class SignatureContext {
          * Adds HTTP headers.
          * <p>
          * Method offers compatibility with {@code HttpServletRequest} methods.
+         * <p>
+         * Example:
+         * <pre>
+         * SignatureContext.builder()
+         *     ...
+         *     .headers(request.getHeaderNames(), request::getHeaders)
+         *     ...
+         *     .build();
+         * </pre>
          *
          * @param headerNames   enumeration of HTTP servlet request header names
          * @param headersGetter getter of HTTP servlet request headers enumeration
@@ -274,6 +293,15 @@ public class SignatureContext {
          * Adds HTTP headers.
          * <p>
          * Method offers compatibility with {@code HttpServletResponse} methods.
+         * <p>
+         * Example:
+         * <pre>
+         * SignatureContext.builder()
+         *     ...
+         *     .headers(response.getHeaderNames(), response::getHeaders)
+         *     ...
+         *     .build();
+         * </pre>
          *
          * @param headerNames   collection of HTTP servlet response header names
          * @param headersGetter getter of HTTP servlet response headers collection

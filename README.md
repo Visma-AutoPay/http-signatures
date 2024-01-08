@@ -254,6 +254,8 @@ var requestContext = SignatureContext.builder()
         .method("POST")
         // Can be provided as a String or URI
         .targetUri("https://example.com/foo")
+        // Or from HttpServletRequest object
+        .targetUri(request.getRequestURL(), request.getQueryString())
         // Status for response signature
         .status(200)
 
@@ -264,6 +266,10 @@ var requestContext = SignatureContext.builder()
         .headers(Map.of("Header-One", "valueOne", "Header-Two", "valueTwo"))
         // Or as a "MultivaluedMap", often used in frameworks
         .headers(Map.of("Header-One", List.of("valueOne", "valueTwo")))
+        // Or from HttpServletRequest object
+        .headers(request.getHeaderNames(), request::getHeaders)
+        // Or from HttpServletResponse object
+        .headers(response.getHeaderNames(), response::getHeaders)
 
         // Context of related request if used in response signature
         .relatedRequest(relatedRequestContext)
