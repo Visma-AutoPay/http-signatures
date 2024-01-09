@@ -20,7 +20,7 @@ Maven dependency is
 <dependency>
     <groupId>net.visma.autopay</groupId>
     <artifactId>http-signatures</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
