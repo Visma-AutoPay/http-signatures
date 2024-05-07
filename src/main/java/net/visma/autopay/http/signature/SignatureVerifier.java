@@ -49,7 +49,7 @@ final class SignatureVerifier {
      * @param verificationSpec Verification specification: parameters, components, context of HTTP request or response, public key supplier, signature label
      * @throws SignatureException Incorrect signature or problems with verification, e.g. missing or malformatted values in Signature Context, problems with the
      *                            public key. For detailed reason call {@link SignatureException#getErrorCode()}.
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-verifying-a-signature">Verifying a Signature</a>
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-verifying-a-signature">Verifying a Signature</a>
      */
     static void verify(VerificationSpec verificationSpec) throws SignatureException {
         new SignatureVerifier(verificationSpec).verify();

@@ -27,7 +27,7 @@ import java.util.Optional;
 /**
  * Hash algorithms. Algorithms with status <em>Deprecated</em> are not handled.
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html#name-establish-the-hash-algorith">
+ * @see <a href="https://www.rfc-editor.org/rfc/rfc9530.html#name-creation-of-the-hash-algori">
  *      Hash Algorithms for HTTP Digest Fields Registry</a>
  */
 public enum DigestAlgorithm {

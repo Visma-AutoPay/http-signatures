@@ -30,13 +30,13 @@ import java.util.Objects;
  * <p>
  * Backed by {@link StructuredString}. Contains component definition - value should be provided in {@link SignatureContext}
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-message-components">HTTP Message Components</a>
+ * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-http-message-components">HTTP Message Components</a>
  */
 abstract class Component {
     /**
      * Structured Parameter key for Structured Dictionary members
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-dictionary-structured-field">
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-dictionary-structured-field">
      *      Dictionary Structured Field Members</a>
      */
     protected static final String DICTIONARY_KEY_PARAM = "key";
@@ -44,7 +44,7 @@ abstract class Component {
     /**
      * Structured Parameter key for structured fields re-serialized to their standard form, without redundant whitespaces
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-strict-serialization-of-htt">
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-strict-serialization-of-htt">
      *      Strict Serialization of HTTP Structured Fields</a>
      */
     protected static final String STRUCTURED_FIELD_PARAM = "sf";
@@ -52,7 +52,7 @@ abstract class Component {
     /**
      * Structured Parameter key for components from Related Request
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-signing-request-components-">
      *      Signing Request Components in a Response Message</a>
      */
     protected static final String RELATED_REQUEST_PARAM = "req";
@@ -60,22 +60,22 @@ abstract class Component {
     /**
      * Structured Parameter key for Query Param name
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-query-parameters">Query Parameters</a>
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-query-parameters">Query Parameters</a>
      */
     protected static final String QUERY_PARAM_NAME_PARAM = "name";
 
     /**
      * Structured Parameter key for Binary-wrapped Fields
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-binary-wrapped-http-fields">
-     *      Binary-wrapped HTTP Fields</a>
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-binary-wrapped-http-fields">
+     *      Binary-Wrapped HTTP Fields</a>
      */
     protected static final String BINARY_WRAPPED_PARAM = "bs";
 
     /**
      * Structured Parameter key for Trailer Fields
      *
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-trailer-fields">
      *     Trailer Fields</a>
      */
     protected static final String TRAILER_PARAM = "tr";
