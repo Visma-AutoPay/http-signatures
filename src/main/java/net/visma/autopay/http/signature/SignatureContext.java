@@ -107,7 +107,7 @@ public class SignatureContext {
      * Returns Signature Context for Related Request
      *
      * @return SignatureContext of Related Request
-     * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-signing-request-components-">
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-signing-request-components-">
      *      Signing Request Components in a Response Message</a>
      */
     SignatureContext getRelatedRequestContext() {
@@ -231,7 +231,7 @@ public class SignatureContext {
          * @param headerName  HTTP header (field) name
          * @param headerValue Header value
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
+         * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-http-fields">HTTP Fields</a>
          */
         public Builder header(String headerName, Object headerValue) {
             populateHeaderOrTrailer(headers, headerName, headerValue);
@@ -251,7 +251,7 @@ public class SignatureContext {
          *
          * @param headers A map of HTTP header names and values
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
+         * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-http-fields">HTTP Fields</a>
          */
         public Builder headers(Map<String, ?> headers) {
             populateHeadersOrTrailers(this.headers, headers);
@@ -329,7 +329,7 @@ public class SignatureContext {
          * @param trailerName  HTTP trailer (field) name
          * @param trailerValue Trailer value
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-trailer-fields">Trailer Fields</a>
          */
         public Builder trailer(String trailerName, Object trailerValue) {
             populateHeaderOrTrailer(trailers, trailerName, trailerValue);
@@ -349,7 +349,7 @@ public class SignatureContext {
          *
          * @param trailers A map of HTTP trailer names and values
          * @return This builder
-         * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-trailer-fields">Trailer Fields</a>
+         * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-trailer-fields">Trailer Fields</a>
          */
         public Builder trailers(Map<String, ?> trailers) {
             populateHeadersOrTrailers(this.trailers, trailers);

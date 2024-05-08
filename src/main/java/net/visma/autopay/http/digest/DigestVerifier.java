@@ -29,7 +29,7 @@ import java.util.Arrays;
 /**
  * Verifies values of <em>Content-Digest</em> and <em>Repr-Digest</em> headers
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-digest-headers-13.html">Digest Fields</a>
+ * @see <a href="https://www.rfc-editor.org/rfc/rfc9530.html">Digest Fields</a>
  */
 public final class DigestVerifier {
     /**

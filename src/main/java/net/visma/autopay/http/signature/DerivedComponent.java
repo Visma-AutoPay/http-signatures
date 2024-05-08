@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * Class representing Derived Components
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-derived-components">Derived Components</a>
+ * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-derived-components">Derived Components</a>
  */
 final class DerivedComponent extends Component {
     private final DerivedComponentType componentType;

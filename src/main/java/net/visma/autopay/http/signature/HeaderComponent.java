@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  * Both "plain" headers, structured fields and dictionary field members are represented.
  * From both "this" and "related" request.
  *
- * @see <a href="https://www.ietf.org/archive/id/draft-ietf-httpbis-message-signatures-19.html#name-http-fields">HTTP Fields</a>
+ * @see <a href="https://www.rfc-editor.org/rfc/rfc9421.html#name-http-fields">HTTP Fields</a>
  */
 final class HeaderComponent extends Component {
     private static final Set<String> ALLOWED_PARAMS = Set.of(DICTIONARY_KEY_PARAM, STRUCTURED_FIELD_PARAM, RELATED_REQUEST_PARAM, BINARY_WRAPPED_PARAM,
