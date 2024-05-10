@@ -1,0 +1,27 @@
+version: "1"
+project:
+  name: ${scm.git.repo}
+  branch: ${env.SCM_BRANCH}
+  revision:
+    name: ${scm.git.commit}
+    date: ${scm.git.commit.date}
+  properties:
+    GROUP: ${env.POLARIS_GROUP_ID}
+    PSC_ID: ${env.POLARIS_PSC_ID}
+  groups:
+    1055Visma.net AutoPay: Administrator
+capture:
+  build:
+    buildCommands:
+      - shell: [mvn, "-ntp", clean, install, "-DskipTests"]
+analyze:
+  mode: central
+  coverity:
+    cov-analyze: ["--webapp-security", "--disable", "CSRF"]
+install:
+  coverity:
+    version: default
+serverUrl: https://visma.polaris.synopsys.com
+### Further reference for building and maintaining the configuration file for Coverity on Polaris ###
+# https://sig-product-docs.synopsys.com/bundle/coverity-on-polaris/page/topics/c_conf-overview.html
+# https://sig-product-docs.synopsys.com/bundle/ci-integrations/page/topics/c_pol-plugin-jenkins-overivew.html
