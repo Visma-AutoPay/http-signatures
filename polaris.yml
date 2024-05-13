@@ -9,11 +9,13 @@ project:
     GROUP: ${env.POLARIS_GROUP_ID}
     PSC_ID: ${env.POLARIS_PSC_ID}
   groups:
-    1055Visma.net AutoPay: Administrator
+    ${env.POLARIS_GROUP_NAME}: ${env.POLARIS_GROUP_ROLE}
 capture:
   build:
+    cleanCommands:
+      - shell: [mvn, clean]
     buildCommands:
-      - shell: [mvn, "-ntp", clean, install, "-DskipTests"]
+      - shell: [mvn, "-ntp", "-B", install, "-DskipTests"]
 analyze:
   mode: central
   coverity:
