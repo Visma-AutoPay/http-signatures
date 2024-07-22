@@ -9,7 +9,7 @@ project:
     GROUP: POLARIS_GROUP_ID
     PSC_ID: POLARIS_PSC_ID
   groups:
-    ${env.POLARIS_GROUP_NAME}: ${env.POLARIS_GROUP_ROLE}
+    POLARIS_GROUP_NAME: POLARIS_GROUP_ROLE
 capture:
   build:
     cleanCommands:
