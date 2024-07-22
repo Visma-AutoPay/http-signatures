@@ -6,8 +6,8 @@ project:
     name: ${scm.git.commit}
     date: ${scm.git.commit.date}
   properties:
-    GROUP: ${env.POLARIS_GROUP_ID}
-    PSC_ID: ${env.POLARIS_PSC_ID}
+    GROUP: POLARIS_GROUP_ID
+    PSC_ID: POLARIS_PSC_ID
   groups:
     ${env.POLARIS_GROUP_NAME}: ${env.POLARIS_GROUP_ROLE}
 capture:
