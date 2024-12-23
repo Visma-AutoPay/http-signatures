@@ -63,7 +63,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <bouncycastle.version>1.79</bouncycastle.version>
-        <junit.version>5.11.3</junit.version>
+        <junit.version>5.11.4</junit.version>
         <assertj.version>3.26.3</assertj.version>
         <jackson.version>2.18.2</jackson.version>
     </properties>
