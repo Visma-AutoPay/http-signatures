@@ -1,0 +1,13 @@
+# This workflow will enforce name on pull requests.
+name: 'PR Name Enforcer'
+on:
+  pull_request:
+    types: [opened, edited, reopened]
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: asafHalely/enforce-pr-title-style-action@81ef1eeb038978021f1f2ea9b1d62b21058c024c
+        with:
+          project_key: AUTOPAY
