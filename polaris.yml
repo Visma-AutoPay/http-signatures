@@ -23,7 +23,7 @@ analyze:
 install:
   coverity:
     version: default
-serverUrl: https://visma.polaris.synopsys.com
+serverUrl: https://visma.cop.blackduck.com
 ### Further reference for building and maintaining the configuration file for Coverity on Polaris ###
 # https://sig-product-docs.synopsys.com/bundle/coverity-on-polaris/page/topics/c_conf-overview.html
 # https://sig-product-docs.synopsys.com/bundle/ci-integrations/page/topics/c_pol-plugin-jenkins-overivew.html
