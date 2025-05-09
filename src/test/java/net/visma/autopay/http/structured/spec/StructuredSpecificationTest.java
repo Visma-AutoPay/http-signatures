@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Visma Autopay AS
+ * Copyright (c) 2022-2025 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,13 +61,13 @@ class StructuredSpecificationTest {
 
         try {
             switch (testRecord.headerType) {
-                case item:
+                case ITEM:
                     item = StructuredItem.parse(inputStr);
                     break;
-                case list:
+                case LIST:
                     item = StructuredList.parse(testRecord.raw);
                     break;
-                case dictionary:
+                case DICTIONARY:
                     item = StructuredDictionary.parse(testRecord.raw);
                     break;
             }

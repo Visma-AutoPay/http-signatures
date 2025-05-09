@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Visma Autopay AS
+ * Copyright (c) 2022-2025 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
  */
 package net.visma.autopay.http.structured.spec;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -45,8 +46,8 @@ class TestRecord {
     }
 
     enum HeaderType {
-        item,
-        list,
-        dictionary
+        @JsonProperty("item") ITEM,
+        @JsonProperty("list") LIST,
+        @JsonProperty("dictionary") DICTIONARY
     }
 }

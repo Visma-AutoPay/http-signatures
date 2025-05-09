@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Visma Autopay AS
+ * Copyright (c) 2022-2025 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -131,7 +131,7 @@ class SignatureSignerTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(signatureSpec::sign, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, signatureSpec::sign);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_HEADER);
@@ -150,7 +150,7 @@ class SignatureSignerTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(signatureSpec::sign, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, signatureSpec::sign);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_HEADER);
@@ -169,7 +169,7 @@ class SignatureSignerTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(signatureSpec::sign, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, signatureSpec::sign);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_HEADER);
@@ -186,7 +186,7 @@ class SignatureSignerTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(signatureSpec::sign, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, signatureSpec::sign);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_HEADER);
@@ -206,7 +206,7 @@ class SignatureSignerTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(signatureSpec::sign, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, signatureSpec::sign);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_DICTIONARY_KEY);
@@ -221,7 +221,7 @@ class SignatureSignerTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(signatureSpec::sign, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, signatureSpec::sign);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_COMPONENT);
@@ -238,7 +238,7 @@ class SignatureSignerTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(signatureSpec::sign, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, signatureSpec::sign);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_RELATED_REQUEST);
@@ -271,7 +271,7 @@ class SignatureSignerTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(signatureSpec::sign, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, signatureSpec::sign);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_STRUCTURED_HEADER);
@@ -291,7 +291,7 @@ class SignatureSignerTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(signatureSpec::sign, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, signatureSpec::sign);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_STRUCTURED_HEADER);
@@ -308,7 +308,7 @@ class SignatureSignerTest {
             var signatureSpecBuilder = ObjectMother.getSignatureSpecBuilder().privateKey(privateKey);
 
             // execute
-            var exception = catchThrowableOfType(signatureSpecBuilder::build, IllegalArgumentException.class);
+            var exception = catchThrowableOfType(IllegalArgumentException.class, signatureSpecBuilder::build);
 
             // verify
             assertThat(exception).hasMessageContaining("private key");
@@ -322,7 +322,7 @@ class SignatureSignerTest {
                     .parameters(SignatureParameters.builder().visibleAlgorithm(SignatureAlgorithm.ED_25519).build());
 
             // execute
-            var exception = catchThrowableOfType(signatureSpecBuilder::build, NullPointerException.class);
+            var exception = catchThrowableOfType(NullPointerException.class, signatureSpecBuilder::build);
 
             // verify
             assertThat(exception).hasMessageContaining("Private key");

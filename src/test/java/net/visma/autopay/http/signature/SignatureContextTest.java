@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Visma Autopay AS
+ * Copyright (c) 2022-2025 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -126,9 +126,6 @@ class SignatureContextTest {
 
         private final Map<String, List<String>> httpHeaders = new HashMap<>();
         private final List<String> headerNames = new ArrayList<>();
-
-        public HttpServletResponseStub() {
-        }
 
         public Collection<String> getHeaderNames() {
             return this.headerNames;

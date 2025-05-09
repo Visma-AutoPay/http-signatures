@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Visma Autopay AS
+ * Copyright (c) 2022-2025 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +34,7 @@ class DataSignerTest {
         var privateKey = SignatureKeyFactory.decodePrivateKey(ObjectMother.getEc256PrivateKey(), SignatureKeyAlgorithm.EC);
 
         // execute
-        var exception = catchThrowableOfType(() -> DataSigner.sign("text", privateKey, SignatureAlgorithm.RSA_SHA_256),
-                SignatureException.class);
+        var exception = catchThrowableOfType(SignatureException.class, () -> DataSigner.sign("text", privateKey, SignatureAlgorithm.RSA_SHA_256));
 
         // verify
         assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_KEY);
@@ -47,8 +46,7 @@ class DataSignerTest {
         var privateKey = SignatureKeyFactory.decodePrivateKey(ObjectMother.getEc256PrivateKey(), SignatureKeyAlgorithm.EC);
 
         // execute
-        var exception = catchThrowableOfType(() -> DataSigner.sign("text", privateKey, SignatureAlgorithm.ECDSA_P384_SHA_384),
-                SignatureException.class);
+        var exception = catchThrowableOfType(SignatureException.class, () -> DataSigner.sign("text", privateKey, SignatureAlgorithm.ECDSA_P384_SHA_384));
 
         // verify
         assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_KEY);

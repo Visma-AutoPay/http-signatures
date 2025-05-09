@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Visma Autopay AS
+ * Copyright (c) 2022-2025 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +34,8 @@ class DataVerifierTest {
         var publicKey = SignatureKeyFactory.decodePublicKey(ObjectMother.getEc256PublicKey(), SignatureKeyAlgorithm.EC);
 
         // execute
-        var exception = catchThrowableOfType(() -> DataVerifier.verify("text", new byte[] {1}, publicKey, SignatureAlgorithm.RSA_SHA_256),
-                SignatureException.class);
+        var exception = catchThrowableOfType(SignatureException.class,
+                () -> DataVerifier.verify("text", new byte[] {1}, publicKey, SignatureAlgorithm.RSA_SHA_256));
 
         // verify
         assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_KEY);
@@ -47,8 +47,8 @@ class DataVerifierTest {
         var publicKey = SignatureKeyFactory.decodePublicKey(ObjectMother.getEc384PublicKey(), SignatureKeyAlgorithm.EC);
 
         // execute
-        var exception = catchThrowableOfType(() -> DataVerifier.verify("text", new byte[] {1}, publicKey, SignatureAlgorithm.ECDSA_P256_SHA_256),
-                SignatureException.class);
+        var exception = catchThrowableOfType(SignatureException.class,
+                () -> DataVerifier.verify("text", new byte[] {1}, publicKey, SignatureAlgorithm.ECDSA_P256_SHA_256));
 
         // verify
         assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_KEY);
@@ -60,8 +60,8 @@ class DataVerifierTest {
         var publicKey = SignatureKeyFactory.decodePublicKey(ObjectMother.getRsaPublicKey(), SignatureKeyAlgorithm.RSA);
 
         // execute
-        var exception = catchThrowableOfType(() -> DataVerifier.verify("text", new byte[] {1}, publicKey, SignatureAlgorithm.RSA_SHA_256),
-                SignatureException.class);
+        var exception = catchThrowableOfType(SignatureException.class,
+                () -> DataVerifier.verify("text", new byte[] {1}, publicKey, SignatureAlgorithm.RSA_SHA_256));
 
         // verify
         assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.GENERIC);

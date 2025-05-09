@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Visma Autopay AS
+ * Copyright (c) 2022-2025 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -58,7 +58,7 @@ class VerificationSpecTest {
                 .maximumAge(10)
                 .maximumSkew(30)
                 .signatureLabel("test")
-                .publicKeyGetter((keyId) -> PublicKeyInfo.builder().build())
+                .publicKeyGetter(keyId -> PublicKeyInfo.builder().build())
                 .build();
         var spec2 = VerificationSpec.builder()
                 .requiredParameters(List.of(SignatureParameterType.CREATED, SignatureParameterType.NONCE))
@@ -85,7 +85,7 @@ class VerificationSpecTest {
                 .maximumAge(10)
                 .maximumSkew(30)
                 .signatureLabel("test")
-                .publicKeyGetter((keyId) -> PublicKeyInfo.builder().build())
+                .publicKeyGetter(keyId -> PublicKeyInfo.builder().build())
                 .build();
 
         // verify
@@ -99,10 +99,10 @@ class VerificationSpecTest {
         // setup
         var specBuilder = VerificationSpec.builder()
                 .context(SignatureContext.builder().build())
-                .publicKeyGetter((keyId) -> PublicKeyInfo.builder().build());
+                .publicKeyGetter(keyId -> PublicKeyInfo.builder().build());
 
         // execute
-        var exception = catchThrowableOfType(specBuilder::build, RuntimeException.class);
+        var exception = catchThrowableOfType(RuntimeException.class, specBuilder::build);
 
         // verify
         assertThat(exception).hasMessageContainingAll("signatureLabel", "applicationTag");

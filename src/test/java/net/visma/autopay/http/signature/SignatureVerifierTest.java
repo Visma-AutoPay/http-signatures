@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Visma Autopay AS
+ * Copyright (c) 2022-2025 Visma Autopay AS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -68,7 +68,7 @@ class SignatureVerifierTest {
                 .build();
 
         // execute
-        var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+        var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
         // verify
         assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INCORRECT_SIGNATURE);
@@ -87,7 +87,7 @@ class SignatureVerifierTest {
                 .build();
 
         // execute
-        var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+        var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
         // verify
         assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.FORBIDDEN_PRESENT);
@@ -102,7 +102,7 @@ class SignatureVerifierTest {
             var verificationSpec = ObjectMother.getVerificationSpecBuilder("test=(\"my-header\")", "test=:YQ==:").build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_HEADER);
@@ -119,7 +119,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_REQUIRED);
@@ -139,10 +139,9 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
-            exception.printStackTrace();
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_QUERY_PARAM);
             assertThat(exception).hasMessageContaining("Query is missing");
         }
@@ -160,7 +159,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_QUERY_PARAM);
@@ -180,7 +179,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_STRUCTURED_HEADER);
@@ -195,7 +194,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_REQUIRED);
@@ -212,7 +211,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_ALGORITHM);
@@ -237,7 +236,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_REQUIRED);
@@ -262,7 +261,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_REQUIRED);
@@ -302,7 +301,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_KEY);
@@ -325,7 +324,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_KEY);
@@ -396,7 +395,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_KEY);
@@ -417,7 +416,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.SIGNATURE_EXPIRED);
@@ -434,7 +433,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.SIGNATURE_EXPIRED);
@@ -450,7 +449,7 @@ class SignatureVerifierTest {
             var verificationSpec = ObjectMother.getVerificationSpecBuilder(signatureInput, signature).build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.SIGNATURE_EXPIRED);
@@ -469,7 +468,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_HEADER);
@@ -486,7 +485,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_DICTIONARY_KEY);
@@ -502,7 +501,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_HEADER);
@@ -520,7 +519,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_STRUCTURED_HEADER);
@@ -537,7 +536,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_DICTIONARY_KEY);
@@ -557,7 +556,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_STRUCTURED_HEADER);
@@ -571,7 +570,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_STRUCTURED_HEADER);
@@ -586,7 +585,7 @@ class SignatureVerifierTest {
                     .build();
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.INVALID_STRUCTURED_HEADER);
@@ -620,7 +619,7 @@ class SignatureVerifierTest {
             var verificationSpec = getVerificationSpec(null, "first");
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.DUPLICATE_TAG);
@@ -633,7 +632,7 @@ class SignatureVerifierTest {
             var verificationSpec = getVerificationSpec(null, "third");
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_TAG);
@@ -646,7 +645,7 @@ class SignatureVerifierTest {
             var verificationSpec = getVerificationSpec("uno", "fourth");
 
             // execute
-            var exception = catchThrowableOfType(verificationSpec::verify, SignatureException.class);
+            var exception = catchThrowableOfType(SignatureException.class, verificationSpec::verify);
 
             // verify
             assertThat(exception.getErrorCode()).isEqualTo(SignatureException.ErrorCode.MISSING_TAG);
