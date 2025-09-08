@@ -65,7 +65,7 @@
         <bouncycastle.version>1.81</bouncycastle.version>
         <junit.version>5.13.4</junit.version>
         <assertj.version>3.27.4</assertj.version>
-        <jackson.version>2.19.2</jackson.version>
+        <jackson.version>2.20.0</jackson.version>
     </properties>
 
     <distributionManagement>
