@@ -10,40 +10,12 @@ This is a Java library implementing the IETF HTTP Message Signatures specificati
 
 ## Build Commands
 
-### Basic Commands
-```bash
-# Clean and compile
-mvn clean compile
-
-# Run all tests
-mvn test
-
-# Run a single test class
-mvn test -Dtest=SignatureSpecTest
-
-# Run a specific test method
-mvn test -Dtest=SignatureSpecTest#shouldSignRequest
-
-# Build and verify (runs tests and checks)
-mvn verify
-
-# Build with code coverage
-mvn clean verify -Pjacoco
-```
+Standard Maven build and test commands apply — see workspace rules (`commands.md`, `testing.md`).
 
 ### CI/CD Build
 The Jenkinsfile defines the CI build:
 - Main branch: `mvn clean verify -ntp -Pjacoco`
 - Feature branches: `mvn clean verify sonar:sonar -ntp -Pjacoco` (includes SonarQube analysis)
-
-### Package Management
-```bash
-# Check for dependency updates
-mvn versions:display-dependency-updates
-
-# Check for plugin updates
-mvn versions:display-plugin-updates
-```
 
 ## Architecture
 
@@ -103,12 +75,6 @@ Structured fields implement RFC 8941 with a type hierarchy:
 - `StructuredParser` - Parses RFC 8941 serialized strings into structured objects
 - `CharacterValidator` - Validates characters according to RFC 8941 rules
 
-Each class has:
-- Factory `of()` methods for easy construction
-- `serialize()` method for RFC 8941 compliant output
-- Static `parse()` method for deserialization
-- Type-specific accessors (e.g., `longValue()`, `stringValue()`, `itemMap()`)
-
 ### Digest Package
 
 Simple utility classes for computing and verifying Content-Digest headers:
@@ -117,12 +83,6 @@ Simple utility classes for computing and verifying Content-Digest headers:
 - `DigestAlgorithm` - Enum of supported algorithms (SHA_256, SHA_512)
 
 ## Key Design Patterns
-
-### Builder Pattern
-All specification classes (SignatureSpec, VerificationSpec, SignatureComponents, SignatureParameters, SignatureContext, PublicKeyInfo) use builders for construction. Builders support multiple input formats and varargs for convenience.
-
-### Immutability
-Specification objects are immutable after construction. Builders create defensive copies of collections.
 
 ### Security Provider Abstraction
 The library uses Java's default security providers but allows third-party providers (like Bouncy Castle) to be registered. For ECDSA signatures, the library specifically uses P1363 format algorithms (e.g., `SHA256withECDSAinP1363Format`) as required by RFC 9421.
@@ -136,8 +96,6 @@ All exceptions extend from `Exception` (checked exceptions), requiring explicit 
 
 ## Testing
 
-- Tests use JUnit 5 (Jupiter)
-- Assertions use AssertJ for fluent API
 - Test utilities include `ObjectMother` for test data generation
 - Specification tests in `net.visma.autopay.http.structured.spec` use JSON test vectors from RFC 8941
 - Bouncy Castle provider is available in test scope for testing with third-party security providers
