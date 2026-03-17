@@ -8,15 +8,6 @@ This is a Java library implementing the IETF HTTP Message Signatures specificati
 
 **Requirements:** Java 11 or newer. No compile dependencies.
 
-## Build Commands
-
-Standard Maven build and test commands apply — see workspace rules (`commands.md`, `testing.md`).
-
-### CI/CD Build
-The Jenkinsfile defines the CI build:
-- Main branch: `mvn clean verify -ntp -Pjacoco`
-- Feature branches: `mvn clean verify sonar:sonar -ntp -Pjacoco` (includes SonarQube analysis)
-
 ## Architecture
 
 ### Package Structure
