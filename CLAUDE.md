@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
 This is a Java library implementing the IETF HTTP Message Signatures specification (RFC 9421), along with Digest Fields (RFC 9530) and Structured Field Values for HTTP (RFC 8941). The library provides high-level interfaces for creating and verifying HTTP signatures for end-to-end integrity and authenticity.
