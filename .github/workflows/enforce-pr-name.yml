@@ -1,13 +1,19 @@
 # This workflow will enforce name on pull requests.
-name: 'PR Name Enforcer'
+name: 'PR Title Enforcer'
 on:
   pull_request:
     types: [opened, edited, reopened]
-jobs:
-  enforce:
-    runs-on: ubuntu-latest
 
+jobs:
+  enforce-title-prefix:
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
     steps:
-      - uses: asafHalely/enforce-pr-title-style-action@81ef1eeb038978021f1f2ea9b1d62b21058c024c
-        with:
-          project_key: AUTOPAY
+      - name: Check if PR title has AUTOPAY-NNNNN prefix
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo "$PR_TITLE" | grep -qE '^AUTOPAY-[0-9]{5,}' && exit 0
+          echo "❌ PR title must start with 'AUTOPAY-' followed by a number (e.g. AUTOPAY-12345)."
+          echo "❌ But it is: $PR_TITLE"
+          exit 1
