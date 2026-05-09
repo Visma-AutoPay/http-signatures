@@ -8,5 +8,7 @@ updates:
     schedule:
       interval: weekly
       day: thursday
+      time: "08:20"
+      timezone: Europe/Oslo
     commit-message:
       prefix: "AUTOPAY-00001"
