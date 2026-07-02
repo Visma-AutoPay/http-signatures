@@ -67,17 +67,20 @@ final class SignatureVerifier {
         verifyRequired();
         verifyForbidden();
         verifyExpiration();
-        var givenSignature = getSignature();
-        var signatureComponents = getComponents();
-        var signatureBase = SignatureSigner.getSignatureBase(signatureComponents, signatureContext, signatureInput);
 
-        var publicKeyInfo = getPublicKeyInfo();
-        var algorithm = getAlgorithm(publicKeyInfo);
-        var publicKey = publicKeyInfo.getPublicKey(algorithm.getKeyAlgorithm());
+        if (verifySignature()) {
+            var givenSignature = getSignature();
+            var signatureComponents = getComponents();
+            var signatureBase = SignatureSigner.getSignatureBase(signatureComponents, signatureContext, signatureInput);
 
-        if (!DataVerifier.verify(signatureBase, givenSignature, publicKey, algorithm)) {
-            throw new SignatureException(ErrorCode.INCORRECT_SIGNATURE, "Provided signature different from computed one.\nUsed algorithm: "
-                    + algorithm.getIdentifier() + "\nSignature base:\n" + signatureBase);
+            var publicKeyInfo = getPublicKeyInfo();
+            var algorithm = getAlgorithm(publicKeyInfo);
+            var publicKey = publicKeyInfo.getPublicKey(algorithm.getKeyAlgorithm());
+
+            if (!DataVerifier.verify(signatureBase, givenSignature, publicKey, algorithm)) {
+                throw new SignatureException(ErrorCode.INCORRECT_SIGNATURE, "Provided signature different from computed one.\nUsed algorithm: "
+                        + algorithm.getIdentifier() + "\nSignature base:\n" + signatureBase);
+            }
         }
     }
 
@@ -94,6 +97,10 @@ final class SignatureVerifier {
         return algorithm;
     }
 
+    private boolean verifySignature() {
+        return verificationSpec.getPublicKeyGetter() != null;
+    }
+    
     private PublicKeyInfo getPublicKeyInfo() throws SignatureException {
         try {
             return verificationSpec.getPublicKeyGetter().apply(signatureParameters.getKeyId());
