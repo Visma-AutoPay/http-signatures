@@ -1,5 +1,21 @@
 # CLAUDE.md
 
+## Knowledge Base
+
+Architecture, conventions, domain model and API contracts for AutoPay live in the
+`autopay-knowledgebase` repo, normally cloned alongside this one. Locate it via `$AUTOPAY_KB`, else
+`../autopay-knowledgebase`, else by walking up parent directories — then read its `CLAUDE.shared.md`
+**before searching the KB**, and follow the routing and reading rules there. Its routing table names
+the right page directly; grepping the KB blind is slower and pulls in heavy docs you don't need.
+
+**This repo has no KB codebase doc yet** (`09-codebases/15-http-signatures.md` is in progress under
+AUTOPAY-38296). Until it lands, the material below is the authoritative description of this library and
+is deliberately *not* trimmed. Once the KB doc exists, move the duplicated parts there and cut this file
+down to the pointer.
+
+To check whether a change you just made needs a KB update, run `/kb-check` rather than deciding by
+hand.
+
 ## Project Overview
 
 This is a Java library implementing the IETF HTTP Message Signatures specification (RFC 9421), along with Digest Fields (RFC 9530) and Structured Field Values for HTTP (RFC 8941). The library provides high-level interfaces for creating and verifying HTTP signatures for end-to-end integrity and authenticity.
