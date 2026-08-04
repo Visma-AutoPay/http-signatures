@@ -3,18 +3,24 @@
 ## Knowledge Base
 
 Architecture, conventions, domain model and API contracts for AutoPay live in the
-`autopay-knowledgebase` repo, normally cloned alongside this one. Locate it via `$AUTOPAY_KB`, else
-`../autopay-knowledgebase`, else by walking up parent directories — then read its `CLAUDE.shared.md`
-**before searching the KB**, and follow the routing and reading rules there. Its routing table names
-the right page directly; grepping the KB blind is slower and pulls in heavy docs you don't need.
+`autopay-knowledgebase` repo, normally cloned alongside this one. Use the first of `$AUTOPAY_KB`,
+`../autopay-knowledgebase`, or a parent directory that **actually contains `CLAUDE.shared.md`** — a set
+but stale `$AUTOPAY_KB` is a hint, not an answer, so keep going down the list. Read that file **before
+searching the KB** and follow its routing and reading rules: the routing table names the right page
+directly, and grepping blind is slower and pulls in heavy docs you don't need. If no candidate has it,
+say the KB is unavailable rather than answering from guesswork.
+
+Consult it before planning, implementing, debugging or reviewing, and check it for prior art before
+inventing a new pattern.
 
 **This repo has no KB codebase doc yet** (`09-codebases/15-http-signatures.md` is in progress under
 AUTOPAY-38296). Until it lands, the material below is the authoritative description of this library and
 is deliberately *not* trimmed. Once the KB doc exists, move the duplicated parts there and cut this file
 down to the pointer.
 
-To check whether a change you just made needs a KB update, run `/kb-check` rather than deciding by
-hand.
+Before opening a PR, check whether the change needs a KB update rather than deciding by hand. In Claude
+Code that is `/kb-check`; with any other tool, apply the same gate directly from the KB's
+`0-meta/durability-gate.md`.
 
 ## Project Overview
 
