@@ -3,12 +3,12 @@
 ## Knowledge Base
 
 Architecture, conventions, domain model and API contracts for AutoPay live in the
-`autopay-knowledgebase` repo, normally cloned alongside this one. Use the first of `$AUTOPAY_KB`,
-`../autopay-knowledgebase`, or a parent directory that **actually contains `CLAUDE.shared.md`** — a set
-but stale `$AUTOPAY_KB` is a hint, not an answer, so keep going down the list. Read that file **before
-searching the KB** and follow its routing and reading rules: the routing table names the right page
-directly, and grepping blind is slower and pulls in heavy docs you don't need. If no candidate has it,
-say the KB is unavailable rather than answering from guesswork.
+`autopay-knowledgebase` repo, normally cloned alongside this one. Locate it by checking, in order,
+`$AUTOPAY_KB`, then `../autopay-knowledgebase`, then each parent directory. **A candidate only counts
+if it contains a readable `CLAUDE.shared.md`** — skip any that does not, including a set but stale
+`$AUTOPAY_KB`. Read that file **before searching the KB** and follow its routing and reading rules: the
+routing table names the right page directly, and grepping blind is slower and pulls in heavy docs you
+don't need. If no candidate has it, say the KB is unavailable rather than answering from guesswork.
 
 Consult it before planning, implementing, debugging or reviewing, and check it for prior art before
 inventing a new pattern.
