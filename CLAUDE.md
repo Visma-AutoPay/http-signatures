@@ -22,6 +22,7 @@ KB at `03-products/01-autopay/09-codebases/15-http-signatures.md` — read
 `15-http-signatures-summary.md` first. Not duplicated here; update the KB doc rather than re-adding it
 to this file.
 
-Before opening a PR, check whether the change needs a KB update rather than deciding by hand — apply
-the gate in the KB's `0-meta/durability-gate.md`. In Claude Code the optional `/kb-check` skill
-automates exactly that; installing it is not required.
+Before opening a PR, check whether the change needs a KB update rather than deciding by hand. Follow
+the procedure in the KB's `skills/kb-check/SKILL.md`: it applies `0-meta/durability-gate.md` across
+every repo the change touches, which the gate alone cannot do. In Claude Code it installs as
+`/kb-check` — installing is optional, running the check is not.
